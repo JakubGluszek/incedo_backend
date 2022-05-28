@@ -1,0 +1,4 @@
+venv/
+hide-files.json
+.env
+**/__pycache__/

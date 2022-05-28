@@ -1,0 +1,30 @@
+{
+  "discord.enabled": false,
+  "python.formatting.provider": "black",
+  "hidefiles.globalConfig": {
+    "profiles": [
+      {
+        "name": "Default",
+        "detail": "Hide python related cache",
+        "hidden": [
+          ".vscode/",
+          "pytest_cache",
+          "*/__pycache__",
+          "**/__pycache__"
+        ]
+      }
+    ]
+  },
+  "hidefiles.selectedProfile": "Default",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    ".vscode/": true,
+    "pytest_cache": true,
+    "*/__pycache__": true,
+    "**/__pycache__": true
+  }
+}
