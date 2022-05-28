@@ -2,3 +2,4 @@ venv/
 hide-files.json
 .env
 **/__pycache__/
+.vscode/
