@@ -19,6 +19,7 @@ class User(BaseModel):
     password: str
     username: str
     avatar: HttpUrl
+    email_verified: bool
     is_super: bool
 
 
@@ -26,4 +27,5 @@ class UserOut(BaseModel):
     id: int
     username: str
     avatar: HttpUrl
+    email_verified: bool
     is_super: bool

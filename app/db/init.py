@@ -17,5 +17,5 @@ def init_first_user(db: Session) -> None:
         password=settings.FIRST_USER_PASSWORD,
         password_repeat=settings.FIRST_USER_PASSWORD,
     )
-    crud.user.create(db, user_in=user_in, is_super=True)
+    crud.user.create(db, user_in=user_in, is_super=True, email_verified=True)
     return
