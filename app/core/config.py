@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Incedo"
     SERVER_HOST: AnyHttpUrl = "http://0.0.0.0"
     SERVER_PORT: int = 8000
+    SERVER_URL: str = f"{SERVER_HOST}:{SERVER_PORT}"
     SECRET_KEY: str = secrets.token_urlsafe(32)
 
     # Database
@@ -28,6 +29,12 @@ class Settings(BaseSettings):
             host=values.get("POSTGRES_SERVER"),
             path=f"/{values.get('POSTGRES_DB') or ''}",
         )
+
+    # User
+    DEFAULT_AVATAR: str = f"{SERVER_URL}/static/images/avatars/default.png"
+    FIRST_USER_USERNAME: str
+    FIRST_USER_EMAIL: str
+    FIRST_USER_PASSWORD: str
 
     class Config:
         env_file = ".env"
