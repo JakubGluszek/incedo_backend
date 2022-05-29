@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     FIRST_USER_EMAIL: str
     FIRST_USER_PASSWORD: str
 
+    # Security
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     class Config:
         env_file = ".env"
 

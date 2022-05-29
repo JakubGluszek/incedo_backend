@@ -22,6 +22,9 @@ class User(BaseModel):
     email_verified: bool
     is_super: bool
 
+    class Config:
+        orm_mode = True
+
 
 class UserOut(BaseModel):
     id: int
