@@ -1,25 +1,44 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
+from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app import api
 from app.core.config import settings
 
+
 middleware = [
     Middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=[
+            "http://localhost:3000",
+            "http://0.0.0.0:3000",
+            "http://127.0.0.1:3000",
+            "https://incedo.netlify.app",
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-    )
+    ),
+    Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY),
 ]
 
 app = FastAPI(title=settings.PROJECT_NAME, middleware=middleware)
+
 app.include_router(api.router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
+@app.exception_handler(AuthJWTException)
+def authjwt_exception_handler(request: Request, exc: AuthJWTException):
+    if exc.message == "Signature has expired":
+        return Response(status_code=403)
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
+
+
 if __name__ == "__main__":
-    uvicorn.run(app, host=settings.SERVER_HOST, port=settings.SERVER_PORT)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

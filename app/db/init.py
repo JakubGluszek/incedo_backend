@@ -11,11 +11,6 @@ def init_db(db: Session) -> None:
 
 
 def init_first_user(db: Session) -> None:
-    user_in = schemas.UserCreate(
-        username=settings.FIRST_USER_USERNAME,
-        email=settings.FIRST_USER_EMAIL,
-        password=settings.FIRST_USER_PASSWORD,
-        password_repeat=settings.FIRST_USER_PASSWORD,
-    )
-    crud.user.create(db, user_in=user_in, is_super=True, email_verified=True)
+    user_in = schemas.UserCreate(email=settings.FIRST_USER_EMAIL)
+    crud.user.create(db, user_in=user_in, is_super=True)
     return

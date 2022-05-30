@@ -1,11 +1,9 @@
 from typing import Generator
 from fastapi import Depends, HTTPException
+from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
-from jose import jwt, JWTError
 
 from app import crud, schemas
-from app.core import security
-from app.core.config import settings
 from app.db.session import SessionLocal
 
 
@@ -18,24 +16,13 @@ def get_db() -> Generator:
 
 
 def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(security.oauth2_scheme)
+    db: Session = Depends(get_db), Authorize: AuthJWT = Depends()
 ) -> schemas.User:
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload: dict = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
-        )
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-        token_data = schemas.TokenPayload(sub=user_id)
-    except JWTError:
-        raise credentials_exception
-    user = crud.user.get(db, token_data.sub)
+    Authorize.jwt_required()
+
+    id = Authorize.get_jwt_subject()
+    user = crud.user.get(db, id)
+
     if not user:
-        raise credentials_exception
+        raise HTTPException(status_code=401)
     return user

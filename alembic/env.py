@@ -30,8 +30,15 @@ target_metadata = Base.metadata
 # ... etc.
 
 import dotenv
+
 dotenv.load_dotenv()
+
+
 def get_url():
+    database_url = os.getenv("DATABASE_URL")
+    print(database_url)
+    if database_url:
+        return database_url.replace("postgres://", "postgresql://")
     user = os.getenv("POSTGRES_USER", "postgres")
     password = os.getenv("POSTGRES_PASSWORD", "admin")
     server = os.getenv("POSTGRES_SERVER", "localhost")

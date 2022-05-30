@@ -1,27 +1,35 @@
-import secrets
+import os
+import dotenv
 from typing import Optional, Dict, Any
-from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, validator
+from pydantic import (
+    BaseModel,
+    BaseSettings,
+    EmailStr,
+    PostgresDsn,
+    validator,
+)
+
+
+dotenv.load_dotenv()
 
 
 class Settings(BaseSettings):
     # General
     PROJECT_NAME: str = "Incedo"
-    SERVER_HOST: AnyHttpUrl = "http://0.0.0.0"
-    SERVER_PORT: int = 8000
-    SERVER_URL: str = f"{SERVER_HOST}:{SERVER_PORT}"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    BACKEND_HOST: str = "http://0.0.0.0:8000"
+    FRONTEND_HOST: str = "http://0.0.0.0:3000"
 
     # Database
     POSTGRES_SERVER: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
-    SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
+    DATABASE_URL: Optional[PostgresDsn] = None
 
-    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
+    @validator("DATABASE_URL", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
-            return v
+            return v.replace("postgres://", "postgresql://")
         return PostgresDsn.build(
             scheme="postgresql",
             user=values.get("POSTGRES_USER"),
@@ -31,15 +39,41 @@ class Settings(BaseSettings):
         )
 
     # User
-    DEFAULT_AVATAR: str = f"{SERVER_URL}/static/images/avatars/default.png"
+    DEFAULT_AVATAR: str = f"{BACKEND_HOST}/static/images/avatars/default.png"
     FIRST_USER_USERNAME: str
     FIRST_USER_EMAIL: str
-    FIRST_USER_PASSWORD: str
 
     # Security
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    SECRET_KEY: str
+    SIGN_IN_TOKEN_EXPIRE_HOURS: int = 2
+
+    # Mail
+    SMTP_TLS: bool = True
+    SMTP_PORT: int
+    SMTP_HOST: str
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+    EMAILS_FROM_EMAIL: EmailStr
+    EMAILS_FROM_NAME: Optional[str] = None
+    EMAIL_TEMPLATES_DIR: str = "./app/email-templates/"
+
+    @validator("EMAILS_FROM_NAME")
+    def get_project_name(cls, v: Optional[str], values: Dict[str, Any]) -> str:
+        if not v:
+            return values["PROJECT_NAME"]
+        return v
+
     class Config:
         env_file = ".env"
+
+
+class JWTSettings(BaseModel):
+    authjwt_secret_key: str = os.environ.get("SECRET_KEY")
+    authjwt_token_location: dict = {"cookies"}
+    authjwt_access_token_expires: int = 60 * 60  # seconds
+    authjwt_cookie_csrf_protect: bool = True
+    authjwt_cookie_secure: bool = True
+    authjwt_cookie_domain: str = "incedo.netlify.app"
 
 
 settings = Settings()

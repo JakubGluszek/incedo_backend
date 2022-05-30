@@ -3,10 +3,8 @@ from pydantic import BaseModel, EmailStr, HttpUrl
 
 
 class UserCreate(BaseModel):
-    username: str
     email: EmailStr
-    password: str
-    password_repeat: str
+    username: Optional[str] = None
 
 
 class UserUpdate(BaseModel):
@@ -16,10 +14,8 @@ class UserUpdate(BaseModel):
 class User(BaseModel):
     id: int
     email: EmailStr
-    password: str
     username: str
     avatar: HttpUrl
-    email_verified: bool
     is_super: bool
 
     class Config:
@@ -30,5 +26,6 @@ class UserOut(BaseModel):
     id: int
     username: str
     avatar: HttpUrl
-    email_verified: bool
-    is_super: bool
+
+    class Config:
+        orm_mode = True
