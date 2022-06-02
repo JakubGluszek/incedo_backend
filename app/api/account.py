@@ -65,8 +65,7 @@ async def sign_in(
 
 @router.get("/signin/google")
 async def sign_in_via_google(request: Request) -> Any:
-    # redirect_uri = request.url_for("sign_in_via_google_callback")
-    redirect_uri = "http://127.0.0.1:8000/account/signin/google/callback"  # dev mode
+    redirect_uri = request.url_for("sign_in_via_google_callback")
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
@@ -83,6 +82,7 @@ async def sign_in_via_google_callback(
     refresh_token = Authorize.create_refresh_token(subject=user.id)
     Authorize.set_access_cookies(access_token, response)
     Authorize.set_refresh_cookies(refresh_token, response)
+    print(response.headers)
 
     return response
 

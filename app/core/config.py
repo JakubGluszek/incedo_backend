@@ -73,7 +73,7 @@ class JWTSettings(BaseModel):
     authjwt_access_token_expires: int = 60 * 60  # seconds
     authjwt_cookie_csrf_protect: bool = True
     authjwt_cookie_secure: bool = True
-    authjwt_cookie_domain: str = "incedo.netlify.app"
+    authjwt_cookie_domain: str = "incedo.me"
 
 
 settings = Settings()
