@@ -2,7 +2,6 @@ import os
 import dotenv
 from typing import Optional, Dict, Any
 from pydantic import (
-    BaseModel,
     BaseSettings,
     EmailStr,
     PostgresDsn,
@@ -16,6 +15,7 @@ dotenv.load_dotenv()
 class Settings(BaseSettings):
     # General
     PROJECT_NAME: str = "Incedo"
+    DEBUG: bool = False
     BACKEND_HOST: str = "http://0.0.0.0:8000"
     FRONTEND_HOST: str = "http://0.0.0.0:3000"
 
@@ -67,13 +67,16 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 
-class JWTSettings(BaseModel):
-    authjwt_secret_key: str = os.environ.get("SECRET_KEY")
-    authjwt_token_location: dict = {"cookies"}
+class JWTSettings(BaseSettings):
+    authjwt_secret_key: str = os.getenv("SECRET_KEY")
+    authjwt_token_location = {"cookies"}
     authjwt_access_token_expires: int = 60 * 60  # seconds
-    authjwt_cookie_csrf_protect: bool = True
-    authjwt_cookie_secure: bool = True
-    authjwt_cookie_domain: str = "incedo.me"
+    authjwt_cookie_csrf_protect: bool
+    authjwt_cookie_secure: bool
+    authjwt_cookie_domain: str
+
+    class Config:
+        env_file = ".env"
 
 
 settings = Settings()

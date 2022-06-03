@@ -22,11 +22,6 @@ oauth.register(
 )
 
 
-@AuthJWT.load_config
-def get_config():
-    return JWTSettings()
-
-
 router = APIRouter()
 
 
@@ -82,7 +77,6 @@ async def sign_in_via_google_callback(
     refresh_token = Authorize.create_refresh_token(subject=user.id)
     Authorize.set_access_cookies(access_token, response)
     Authorize.set_refresh_cookies(refresh_token, response)
-    print(response.headers)
 
     return response
 

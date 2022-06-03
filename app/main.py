@@ -5,10 +5,11 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app import api
-from app.core.config import settings
+from app.core.config import JWTSettings, settings
 
 
 middleware = [
@@ -39,6 +40,13 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
         return Response(status_code=403)
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
+
+@AuthJWT.load_config
+def get_config():
+    jwt_settings = JWTSettings()
+    if settings.DEBUG:
+        del jwt_settings.authjwt_cookie_domain
+    return jwt_settings
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
