@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class NoteCreate(BaseModel):
@@ -19,6 +19,10 @@ class NoteOut(BaseModel):
     body: str
     created_at: datetime
     updated_at: datetime
+
+    @validator("created_at", "updated_at")
+    def convert_to_timestamp(cls, v: datetime) -> int:
+        return int(v.timestamp())
 
     class Config:
         orm_mode = True
