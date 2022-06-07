@@ -8,9 +8,8 @@ from starlette.config import Config
 from fastapi_jwt_auth import AuthJWT
 
 from . import deps
-from app import schemas
-from app.services import auth
-from app.core.config import JWTSettings, settings
+from app import schemas, services
+from app.core.config import settings
 
 
 config = Config(".env")
@@ -36,7 +35,7 @@ async def get_token_via_email(
     email: EmailStr = Body(..., embed=True),
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    auth.send_token_via_email(db, email=email, bg=bg)
+    services.send_token_via_email(db, email=email, bg=bg)
     return
 
 
@@ -47,7 +46,7 @@ async def sign_in(
     db: Session = Depends(deps.get_db),
     Authorize: AuthJWT = Depends(),
 ) -> Any:
-    user = auth.sign_in(db, token_in=token)
+    user = services.sign_in(db, token_in=token)
 
     access_token = Authorize.create_access_token(subject=user.id)
     refresh_token = Authorize.create_refresh_token(subject=user.id)
@@ -69,7 +68,7 @@ async def sign_in_via_google_callback(
     request: Request, db: Session = Depends(deps.get_db), Authorize: AuthJWT = Depends()
 ) -> Any:
     code = await oauth.google.authorize_access_token(request)
-    user = auth.login_via_google(db, code=code)
+    user = services.sign_in_via_google(db, code=code)
 
     response = RedirectResponse(settings.FRONTEND_HOST)
 

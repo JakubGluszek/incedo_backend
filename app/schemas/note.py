@@ -13,6 +13,15 @@ class NoteUpdate(BaseModel):
     body: Optional[str] = None
 
 
+class Note(BaseModel):
+    id: int
+    title: Optional[str] = None
+    body: str
+    created_at: datetime
+    updated_at: datetime
+    user_id: int
+
+
 class NoteOut(BaseModel):
     id: int
     title: Optional[str] = None
@@ -26,12 +35,3 @@ class NoteOut(BaseModel):
 
     class Config:
         orm_mode = True
-
-
-class Note(BaseModel):
-    id: int
-    title: Optional[str] = None
-    body: str
-    created_at: datetime
-    updated_at: datetime
-    user_id: int
