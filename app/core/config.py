@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     # General
     PROJECT_NAME: str = "Incedo"
     DEBUG: bool = False
-    BACKEND_HOST: str = "http://0.0.0.0:8000"
-    FRONTEND_HOST: str = "http://0.0.0.0:3000"
+    BACKEND_HOST: str = os.getenv("BACKEND_HOST")
+    FRONTEND_HOST: str = os.getenv("FRONTEND_HOST")
 
     # Database
     POSTGRES_SERVER: str

@@ -11,16 +11,15 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from app import api
 from app.core.config import JWTSettings, settings
 
+if settings.DEBUG:
+    origins = ["http://127.0.0.1:3000"]
+else:
+    origins = ["https://www.incedo.me"]
 
 middleware = [
     Middleware(
         CORSMiddleware,
-        allow_origins=[
-            "http://localhost:3000",
-            "http://0.0.0.0:3000",
-            "http://127.0.0.1:3000",
-            "https://www.incedo.me",
-        ],
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -47,6 +46,7 @@ def get_config():
     if settings.DEBUG:
         del jwt_settings.authjwt_cookie_domain
     return jwt_settings
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

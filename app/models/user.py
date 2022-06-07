@@ -1,7 +1,6 @@
 import secrets
 from pydantic import EmailStr
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
-from datetime import datetime, timedelta
+from sqlalchemy import Column, Integer, String, Boolean
 
 from app.core.config import settings
 from app.db.base import Base
