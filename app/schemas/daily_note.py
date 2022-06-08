@@ -25,3 +25,6 @@ class DailyNoteOut(BaseModel):
     @validator("date")
     def convert_to_timestamp(cls, v: datetime) -> int:
         return int(v.timestamp())
+
+    class Config:
+        orm_mode = True
