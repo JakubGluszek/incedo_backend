@@ -6,6 +6,12 @@ from app import crud, schemas
 from app.utils.mail import send_token_via_email
 
 
+def create_user(db: Session, *, user_in: schemas.UserCreate, is_super: bool = False) -> schemas.User:
+    user = crud.user.create(db, user_in=user_in, is_super=is_super)
+    crud.user_settings.create(db, user=user)
+    return user
+
+
 def send_token_via_email(db: Session, *, email: EmailStr, bg: BackgroundTasks) -> None:
     token = crud.token.create(db, email=email)
     bg.add_task(
@@ -24,7 +30,7 @@ def sign_in(db: Session, *, token_in: str) -> schemas.User:
     user = crud.user.get_by_email(db, token.email)
     if not user:
         user_in = schemas.UserCreate(email=token.email)
-        user = crud.user.create(db, user_in=user_in)
+        create_user(db, user_in)
 
     crud.token.remove_by_email(db, token.email)
 
@@ -34,7 +40,9 @@ def sign_in(db: Session, *, token_in: str) -> schemas.User:
 def sign_in_via_google(db: Session, *, code: dict) -> schemas.User:
     email = code["userinfo"]["email"]
     user = crud.user.get_by_email(db, email)
+    
     if not user:
         user_in = schemas.UserCreate(email=email)
-        user = crud.user.create(db, user_in=user_in)
+        create_user(db, user_in)
+
     return user
