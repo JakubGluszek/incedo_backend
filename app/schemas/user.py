@@ -1,8 +1,6 @@
-from typing import Optional, ForwardRef
+from __future__ import annotations
+from typing import Optional
 from pydantic import BaseModel, EmailStr, HttpUrl
-
-
-UserSettings = ForwardRef("UserSettings")
 
 
 class UserCreate(BaseModel):
@@ -27,12 +25,12 @@ class User(BaseModel):
 
 
 class UserOut(BaseModel):
-    id: int
     username: str
     avatar: HttpUrl
+    is_super: bool
 
     class Config:
         orm_mode = True
 
-
+from .user_settings import UserSettings
 User.update_forward_refs()

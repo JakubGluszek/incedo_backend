@@ -3,7 +3,7 @@ from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from app import crud, schemas
-from app.utils.mail import send_token_via_email
+from app.utils import mail
 
 
 def create_user(db: Session, *, user_in: schemas.UserCreate, is_super: bool = False) -> schemas.User:
@@ -12,10 +12,10 @@ def create_user(db: Session, *, user_in: schemas.UserCreate, is_super: bool = Fa
     return user
 
 
-def send_token_via_email(db: Session, *, email: EmailStr, bg: BackgroundTasks) -> None:
+def create_and_send_token(db: Session, *, email: EmailStr, bg: BackgroundTasks) -> None:
     token = crud.token.create(db, email=email)
     bg.add_task(
-        send_token_via_email,
+        mail.send_token,
         email_to=token.email,
         token=token.token,
     )

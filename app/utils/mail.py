@@ -28,7 +28,7 @@ def send_email(
     message.send(to=email_to, render=environment, smtp=smtp_options)
 
 
-def send_token_via_email(email_to: str, token: str) -> None:
+def send_token(email_to: str, token: str) -> None:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Sign in."
     link = f"{settings.FRONTEND_HOST}/callback/email?token={token}"

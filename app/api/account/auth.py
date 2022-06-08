@@ -7,8 +7,8 @@ from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from fastapi_jwt_auth import AuthJWT
 
-from . import deps
 from app import schemas, services
+from app.api import deps
 from app.core.config import settings
 
 
@@ -24,22 +24,17 @@ oauth.register(
 router = APIRouter()
 
 
-@router.get("", response_model=schemas.User)
-async def get_account(current_user: schemas.User = Depends(deps.get_current_user)):
-    return current_user
-
-
 @router.post("/token", response_class=Response)
 async def get_token_via_email(
     bg: BackgroundTasks,
     email: EmailStr = Body(..., embed=True),
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    services.send_token_via_email(db, email=email, bg=bg)
+    services.create_and_send_token(db, email=email, bg=bg)
     return
 
 
-@router.post("/signin", response_model=schemas.User)
+@router.post("/signin", response_model=schemas.UserOut)
 async def sign_in(
     response: JSONResponse,
     token: str = Body(..., embed=True),

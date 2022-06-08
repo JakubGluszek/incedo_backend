@@ -1,23 +1,30 @@
-from typing import Optional, ForwardRef
-from pydantic import BaseModel
-
-
-User = ForwardRef("User")
+from typing import Optional
+from pydantic import BaseModel, validator
 
 
 class UserSettingsUpdate(BaseModel):
     time_diff: Optional[int] = None
+
+    @validator("time_diff")
+    def validate_diff(cls, v) -> int:
+        if v < -11:
+            raise ValueError("Time diff is too small")
+        elif v > 12:
+            raise ValueError("Time diff is too big")
+        return v
 
 
 class UserSettings(BaseModel):
     id: int
     time_diff: Optional[int]
     user_id: int
-    user: User
+
+    class Config:
+        orm_mode = True
 
 
 class UserSettingsOut(BaseModel):
     time_diff: Optional[int]
 
-
-UserSettings.update_forward_refs()
+    class Config:
+        orm_mode = True
