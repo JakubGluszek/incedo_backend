@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 
 
 class DailyNoteCreate(BaseModel):
@@ -20,11 +20,6 @@ class DailyNote(BaseModel):
 class DailyNoteOut(BaseModel):
     id: int
     body: str
-    date: datetime
-
-    @validator("date")
-    def convert_to_timestamp(cls, v: datetime) -> int:
-        return int(v.timestamp())
 
     class Config:
         orm_mode = True

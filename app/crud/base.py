@@ -1,8 +1,10 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from fastapi import HTTPException
 from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
+from app import schemas
 from app.db.base import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
@@ -55,3 +57,15 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.delete(obj)
         db.commit()
         return obj
+
+    def get_by_id_and_user(
+        self, db: Session, *, id: int, user: schemas.User
+    ) -> ModelType:
+        db_obj = (
+            db.query(self.model)
+            .filter(self.model.id == id, self.model.user_id == user.id)
+            .first()
+        )
+        if not db_obj:
+            raise HTTPException(status_code=404)
+        return db_obj

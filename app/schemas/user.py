@@ -32,5 +32,7 @@ class UserOut(BaseModel):
     class Config:
         orm_mode = True
 
+
 from .user_settings import UserSettings
+
 User.update_forward_refs()
