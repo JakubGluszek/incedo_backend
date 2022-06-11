@@ -12,7 +12,12 @@ from app import api
 from app.core.config import JWTSettings, settings
 
 if settings.DEBUG:
-    origins = ["http://127.0.0.1:3000"]
+    origins = [
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+        "http://0.0.0.0:3000",
+        "http://192.168.2.56:3000",
+    ]
 else:
     origins = ["https://www.incedo.me"]
 

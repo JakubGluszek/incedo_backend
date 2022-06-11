@@ -10,9 +10,10 @@ class Note(Base):
     body: str = Column(Text, server_default="", nullable=False)
     created_at: datetime = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: datetime = Column(DateTime, default=datetime.utcnow, nullable=False)
+    note_folder: int = Column(Integer, ForeignKey("notefolder.id"), nullable=False)
     user_id: int = Column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
-
+    
     def __repr__(self):
         return f"{self.id}, {self.user_id}"
