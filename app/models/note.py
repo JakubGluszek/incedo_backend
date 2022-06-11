@@ -1,6 +1,8 @@
 from typing import Optional
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from datetime import datetime
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy.orm import relationship, backref
+
 from app.db.base import Base
 
 
@@ -10,10 +12,12 @@ class Note(Base):
     body: str = Column(Text, server_default="", nullable=False)
     created_at: datetime = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: datetime = Column(DateTime, default=datetime.utcnow, nullable=False)
-    folder_id: int = Column(Integer, ForeignKey("notefolder.id"), nullable=False)
-    user_id: int = Column(
-        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+    folder_id: int = Column(
+        Integer, ForeignKey("notesfolder.id", ondelete="CASCADE"), nullable=True
     )
-    
+    user_id: int = Column(ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
+
+    user = relationship("User", backref=backref("notes", cascade="all, delete"))
+
     def __repr__(self):
         return f"{self.id}, {self.user_id}"

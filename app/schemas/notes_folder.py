@@ -3,24 +3,24 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
-class NoteFolderCreate(BaseModel):
+class NotesFolderCreate(BaseModel):
     label: Optional[str] = Field(None, max_length=32)
     parent_id: Optional[int] = None
 
 
-class NoteFolderUpdate(BaseModel):
+class NotesFolderUpdate(BaseModel):
     label: Optional[str] = Field(None, max_length=32)
     parent_id: Optional[int] = None
 
 
-class NoteFolder(BaseModel):
+class NotesFolder(BaseModel):
     id: int
     label: str
     parent_id: Optional[int]
     user_id: int
 
 
-class NoteFolderOut(BaseModel):
+class NotesFolderOut(BaseModel):
     id: int
     label: str
     parent_id: Optional[int]
@@ -32,4 +32,4 @@ class NoteFolderOut(BaseModel):
 
 from app.schemas import NoteOut
 
-NoteFolderOut.update_forward_refs()
+NotesFolderOut.update_forward_refs()

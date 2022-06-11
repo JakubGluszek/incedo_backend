@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Depends
+from typing import Any
+from fastapi import APIRouter, Depends, Response
+from sqlalchemy.orm import Session
 
-from app import schemas
+from app import schemas, crud
 from app.api import deps
 
 
@@ -8,5 +10,16 @@ router = APIRouter()
 
 
 @router.get("", response_model=schemas.UserOut)
-async def get_account(current_user: schemas.User = Depends(deps.get_current_user)):
+async def get_current_user(
+    current_user: schemas.User = Depends(deps.get_current_user),
+) -> Any:
     return current_user
+
+
+@router.delete("", status_code=204, response_class=Response)
+async def remove_current_user(
+    db: Session = Depends(deps.get_db),
+    current_user: schemas.User = Depends(deps.get_current_user),
+) -> Any:
+    crud.user.remove(db, user=current_user)
+    return

@@ -17,13 +17,13 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         # validate folder
         if note_in.folder_id:
             try:
-                crud.note_folder.get_by_id_and_user(db, id=note_in.folder_id, user=user)
+                crud.notes_folder.get_by_id_and_user(db, id=note_in.folder_id, user=user)
             except HTTPException:
                 raise HTTPException(
                     status_code=422, detail=[self.Errors.invalid_folder]
                 )
 
-        note = self.model(**note_in.dict(), user_id=user.id)
+        note = self.model(**note_in.dict(exclude_none=True), user_id=user.id)
 
         db.add(note)
         db.commit()
@@ -53,7 +53,7 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         # validate folder
         if update.folder_id:
             try:
-                crud.note_folder.get_by_id_and_user(db, id=update.folder_id, user=user)
+                crud.notes_folder.get_by_id_and_user(db, id=update.folder_id, user=user)
             except HTTPException:
                 raise HTTPException(
                     status_code=422, detail=[self.Errors.invalid_folder]

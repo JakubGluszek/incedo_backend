@@ -6,15 +6,15 @@ from .base import CRUDBase
 from app import models, schemas
 
 
-class CRUDNoteFolder(
-    CRUDBase[models.NoteFolder, schemas.NoteFolderCreate, schemas.NoteFolderUpdate]
+class CRUDNotesFolder(
+    CRUDBase[models.NotesFolder, schemas.NotesFolderCreate, schemas.NotesFolderUpdate]
 ):
     class Errors:
         invalid_parent = {"loc": ["body", "parent_id"], "msg": "Invalid parent."}
 
     def create(
-        self, db: Session, *, folder_in: schemas.NoteFolderCreate, user: schemas.User
-    ) -> schemas.NoteFolder:
+        self, db: Session, *, folder_in: schemas.NotesFolderCreate, user: schemas.User
+    ) -> schemas.NotesFolder:
         if not folder_in.label:
             index = len(
                 db.query(self.model)
@@ -39,9 +39,9 @@ class CRUDNoteFolder(
         db: Session,
         *,
         id: int,
-        update: schemas.NoteFolderUpdate,
+        update: schemas.NotesFolderUpdate,
         user: schemas.User,
-    ) -> schemas.NoteFolder:
+    ) -> schemas.NotesFolder:
         # get valid folder
         folder = self.get(db, id)
         if not folder or folder.user_id != user.id:
@@ -59,7 +59,7 @@ class CRUDNoteFolder(
 
     def get_multi(
         self, db: Session, *, user_id: int, skip: int = 0, limit: int = 100
-    ) -> List[schemas.NoteFolder]:
+    ) -> List[schemas.NotesFolder]:
         return (
             db.query(self.model)
             .filter(self.model.user_id == user_id)
@@ -68,5 +68,10 @@ class CRUDNoteFolder(
             .all()
         )
 
+    def remove(self, db: Session, *, id: int, user: schemas.User) -> None:
+        folder = self.get_by_id_and_user(db, id=id, user=user)
+        super().remove(db, id=folder.id)
+        return
 
-note_folder = CRUDNoteFolder(models.NoteFolder)
+
+notes_folder = CRUDNotesFolder(models.NotesFolder)
