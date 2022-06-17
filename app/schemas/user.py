@@ -1,15 +1,15 @@
 from __future__ import annotations
 from typing import Optional
-from pydantic import BaseModel, EmailStr, HttpUrl
+from pydantic import BaseModel, EmailStr, HttpUrl, Field
 
 
 class UserCreate(BaseModel):
     email: EmailStr
-    username: Optional[str] = None
+    username: Optional[str] = Field(None, max_length=24)
 
 
 class UserUpdate(BaseModel):
-    username: Optional[str] = None
+    username: Optional[str] = Field(None, max_length=24)
 
 
 class User(BaseModel):

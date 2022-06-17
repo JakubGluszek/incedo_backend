@@ -30,7 +30,7 @@ def sign_in(db: Session, *, token_in: str) -> schemas.User:
     user = crud.user.get_by_email(db, token.email)
     if not user:
         user_in = schemas.UserCreate(email=token.email)
-        create_user(db, user_in)
+        create_user(db, user_in=user_in)
 
     crud.token.remove_by_email(db, token.email)
 
@@ -43,6 +43,6 @@ def sign_in_via_google(db: Session, *, code: dict) -> schemas.User:
     
     if not user:
         user_in = schemas.UserCreate(email=email)
-        create_user(db, user_in)
+        create_user(db, user_in=user_in)
 
     return user
