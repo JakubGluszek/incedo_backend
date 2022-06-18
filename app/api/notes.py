@@ -39,7 +39,7 @@ async def remove_note(
     return
 
 
-@router.get("/{note_id}")
+@router.get("/{note_id}", response_model=schemas.NoteOut)
 async def get_note(
     note_id: int,
     db: Session = Depends(deps.get_db),

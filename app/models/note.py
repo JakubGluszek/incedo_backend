@@ -8,12 +8,12 @@ from app.db.base import Base
 
 class Note(Base):
     id: int = Column(Integer, primary_key=True)
-    title: Optional[str] = Column(String, nullable=True)
+    label: Optional[str] = Column(String, nullable=True)
     body: str = Column(Text, server_default="", nullable=False)
     created_at: datetime = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: datetime = Column(DateTime, default=datetime.utcnow, nullable=False)
-    folder_id: int = Column(
-        Integer, ForeignKey("notesfolder.id", ondelete="CASCADE"), nullable=True
+    notebook_id: int = Column(
+        Integer, ForeignKey("notebook.id", ondelete="CASCADE"), nullable=True
     )
     user_id: int = Column(ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
 
