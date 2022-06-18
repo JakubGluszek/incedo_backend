@@ -8,6 +8,7 @@ from app.db.base import Base
 class Notebook(Base):
     id: int = Column(Integer, primary_key=True)
     label: str = Column(String, nullable=False)
+    rank: int = Column(Integer, nullable=False)
     about: Optional[str] = Column(String, nullable=True)
     user_id: int = Column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False

@@ -11,18 +11,21 @@ class NotebookCreate(BaseModel):
 class NotebookUpdate(BaseModel):
     label: Optional[str] = Field(None, max_length=32)
     about: Optional[str] = None
+    rank: Optional[int] = None
 
 
 class Notebook(BaseModel):
     id: int
     label: str
-    about: Optional[str] = None
+    about: Optional[str]
+    rank: int
     user_id: int
 
 
 class NotebookOut(BaseModel):
     id: int
     label: str
+    rank: int
     about: Optional[str] = None
     notes: List[NoteOut]
 

@@ -12,6 +12,7 @@ class NoteCreate(BaseModel):
 class NoteUpdate(BaseModel):
     label: Optional[str] = Field(None, max_length=64)
     body: Optional[str] = None
+    rank: Optional[int] = None
     notebook_id: Optional[int] = None
 
 
@@ -19,6 +20,7 @@ class Note(BaseModel):
     id: int
     label: Optional[str]
     body: str
+    rank: int
     notebook_id: int
     created_at: datetime
     updated_at: datetime
@@ -29,6 +31,7 @@ class NoteOut(BaseModel):
     id: int
     label: str
     body: str
+    rank: int
     notebook_id: int
     created_at: int
     updated_at: int

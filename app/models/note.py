@@ -10,6 +10,7 @@ class Note(Base):
     id: int = Column(Integer, primary_key=True)
     label: Optional[str] = Column(String, nullable=True)
     body: str = Column(Text, server_default="", nullable=False)
+    rank: int = Column(Integer, nullable=False)
     created_at: datetime = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: datetime = Column(DateTime, default=datetime.utcnow, nullable=False)
     notebook_id: int = Column(
