@@ -42,9 +42,7 @@ async def remove_notebooks(
     return
 
 
-@router.get(
-    "", response_model=List[schemas.NotebookOut], response_model_exclude={"notes"}
-)
+@router.get("", response_model=List[schemas.NotebookOut])
 async def get_multi_notebooks(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=0, le=100),

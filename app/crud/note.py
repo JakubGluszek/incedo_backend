@@ -19,11 +19,18 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
             try:
                 crud.notebook.get_by_id_and_user(db, id=note_in.notebook_id, user=user)
             except HTTPException:
-                raise HTTPException(
-                    status_code=422, detail=[self.Errors.no_notebook]
-                )
-
-        note = self.model(**note_in.dict(exclude_none=True), user_id=user.id)
+                raise HTTPException(status_code=422, detail=[self.Errors.no_notebook])
+        
+        rank = len(
+            db.query(self.model)
+            .filter(
+                self.model.notebook_id == note_in.notebook_id,
+            )
+            .all()
+        )
+        if not note_in.label:
+            note_in.label = f"Note {rank}"
+        note = self.model(**note_in.dict(exclude_none=True), user_id=user.id, rank=rank)
 
         db.add(note)
         db.commit()
@@ -55,9 +62,7 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
             try:
                 crud.notebook.get_by_id_and_user(db, id=update.notebook_id, user=user)
             except HTTPException:
-                raise HTTPException(
-                    status_code=422, detail=[self.Errors.no_notebook]
-                )
+                raise HTTPException(status_code=422, detail=[self.Errors.no_notebook])
 
         updated_note = super().update(db, db_obj=note, obj_in=update)
         return updated_note

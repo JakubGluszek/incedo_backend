@@ -12,17 +12,17 @@ class CRUDNotebook(
     def create(
         self, db: Session, *, notebook_in: schemas.NotebookCreate, user: schemas.User
     ) -> schemas.Notebook:
-        if not notebook_in.label:
-            index = len(
-                db.query(self.model)
-                .filter(
-                    self.model.user_id == user.id,
-                )
-                .all()
+        rank = len(
+            db.query(self.model)
+            .filter(
+                self.model.user_id == user.id,
             )
-            notebook_in.label = f"Notebook {index}"
+            .all()
+        )
+        if not notebook_in.label:
+            notebook_in.label = f"Notebook {rank}"
 
-        notebook = self.model(**notebook_in.dict(), user_id=user.id)
+        notebook = self.model(**notebook_in.dict(), user_id=user.id, rank=rank)
 
         db.add(notebook)
         db.commit()

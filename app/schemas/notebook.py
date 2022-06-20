@@ -4,14 +4,13 @@ from pydantic import BaseModel, Field
 
 
 class NotebookCreate(BaseModel):
-    label: str = Field(..., max_length=32)
-    about: Optional[str] = None
+    label: Optional[str] = Field(None, max_length=32)
+    about: Optional[str] = Field(None, max_length=256)
 
 
 class NotebookUpdate(BaseModel):
     label: Optional[str] = Field(None, max_length=32)
-    about: Optional[str] = None
-    rank: Optional[int] = None
+    about: Optional[str] = Field(None, max_length=256)
 
 
 class Notebook(BaseModel):
