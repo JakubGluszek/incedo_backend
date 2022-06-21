@@ -63,3 +63,13 @@ async def get_notebook(
 ) -> Any:
     notebook = crud.notebook.get_by_id_and_user(db, id=notebook_id, user=current_user)
     return notebook
+
+
+@router.post("/ranks", response_model=List[schemas.NotebookOut])
+async def update_notebook_rank(
+    update: schemas.NotebookUpdateRank,
+    db: Session = Depends(deps.get_db),
+    current_user: schemas.User = Depends(deps.get_current_user),
+) -> Any:
+    notebooks = crud.notebook.update_rank(db, update=update, user=current_user)
+    return notebooks

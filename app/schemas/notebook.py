@@ -32,6 +32,11 @@ class NotebookOut(BaseModel):
         orm_mode = True
 
 
+class NotebookUpdateRank(BaseModel):
+    id: int
+    rank: int
+
+
 from app.schemas import NoteOut
 
 NotebookOut.update_forward_refs()
