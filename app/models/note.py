@@ -12,9 +12,7 @@ class Note(Base):
     body: str = Column(Text, server_default="", nullable=False)
     rank: int = Column(Integer, nullable=False)
     created_at: datetime = Column(DateTime, default=datetime.utcnow)
-    edited_at: datetime = Column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    edited_at: datetime = Column(DateTime, default=datetime.utcnow)
     notebook_id: int = Column(
         Integer, ForeignKey("notebook.id", ondelete="CASCADE"), nullable=True
     )

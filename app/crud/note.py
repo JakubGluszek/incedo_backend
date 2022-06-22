@@ -18,7 +18,9 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         # validate notebook
         if note_in.notebook_id:
             try:
-                notebook = crud.notebook.get_by_id_and_user(db, id=note_in.notebook_id, user=user)
+                notebook = crud.notebook.get_by_id_and_user(
+                    db, id=note_in.notebook_id, user=user
+                )
             except HTTPException:
                 raise HTTPException(status_code=422, detail=[self.Errors.no_notebook])
 
@@ -68,9 +70,15 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
             except HTTPException:
                 raise HTTPException(status_code=422, detail=[self.Errors.no_notebook])
         else:
-            notebook = crud.notebook.get_by_id_and_user(db, id=note.notebook_id, user=user)
-        
-        notebook.edited_at = datetime.utcnow()
+            notebook = crud.notebook.get_by_id_and_user(
+                db, id=note.notebook_id, user=user
+            )
+
+        edited_at = datetime.utcnow()
+
+        notebook.edited_at = edited_at
+        note.edited_at = edited_at
+
         db.add(notebook)
 
         updated_note = super().update(db, db_obj=note, obj_in=update)

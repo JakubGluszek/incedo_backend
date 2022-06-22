@@ -45,6 +45,7 @@ class CRUDNotebook(
         if not notebook or notebook.user_id != user.id:
             raise HTTPException(status_code=404)
         # update
+        notebook.edited_at = datetime.utcnow()
         notebook = super().update(db, db_obj=notebook, obj_in=update)
         return notebook
 
