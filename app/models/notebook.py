@@ -1,5 +1,6 @@
+from datetime import datetime
 from typing import Optional
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -10,6 +11,12 @@ class Notebook(Base):
     label: str = Column(String, nullable=False)
     rank: int = Column(Integer, nullable=False)
     about: Optional[str] = Column(String, nullable=True)
+    created_at: datetime = Column(DateTime, default=datetime.utcnow)
+    edited_at: datetime = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
     user_id: int = Column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )

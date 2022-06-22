@@ -1,6 +1,7 @@
 from __future__ import annotations
+from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class NotebookCreate(BaseModel):
@@ -18,6 +19,8 @@ class Notebook(BaseModel):
     label: str
     about: Optional[str]
     rank: int
+    created_at: datetime
+    edited_at: datetime
     user_id: int
 
 
@@ -26,8 +29,14 @@ class NotebookOut(BaseModel):
     label: str
     rank: int
     about: Optional[str] = None
-    notes: List[NoteOut]
+    created_at: int
+    edited_at: int
 
+    @validator("created_at", "edited_at", pre=True)
+    def convert_to_timestamp(cls, v: datetime) -> int:
+        return int(v.timestamp())
+
+    notes: List[NoteOut]
     class Config:
         orm_mode = True
 

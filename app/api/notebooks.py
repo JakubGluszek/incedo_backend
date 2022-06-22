@@ -19,7 +19,11 @@ async def create_notebooks(
     return notebook
 
 
-@router.put("/{notebook_id}")
+@router.put(
+    "/{notebook_id}",
+    response_model=schemas.NotebookOut,
+    response_model_exclude={"notes"},
+)
 async def update_notebooks(
     notebook_id: int,
     update: schemas.NotebookUpdate,

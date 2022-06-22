@@ -11,7 +11,6 @@ class NoteCreate(BaseModel):
 class NoteUpdate(BaseModel):
     label: Optional[str] = Field(None, max_length=64)
     body: Optional[str] = None
-    rank: Optional[int] = None
     notebook_id: Optional[int] = None
 
 
@@ -20,9 +19,9 @@ class Note(BaseModel):
     label: Optional[str]
     body: str
     rank: int
-    notebook_id: int
     created_at: datetime
-    updated_at: datetime
+    edited_at: datetime
+    notebook_id: int
     user_id: int
 
 
@@ -31,11 +30,11 @@ class NoteOut(BaseModel):
     label: str
     body: str
     rank: int
-    notebook_id: int
     created_at: int
-    updated_at: int
+    edited_at: int
+    notebook_id: int
 
-    @validator("created_at", "updated_at", pre=True)
+    @validator("created_at", "edited_at", pre=True)
     def convert_to_timestamp(cls, v: datetime) -> int:
         return int(v.timestamp())
 

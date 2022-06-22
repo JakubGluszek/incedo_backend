@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -17,10 +18,10 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         # validate notebook
         if note_in.notebook_id:
             try:
-                crud.notebook.get_by_id_and_user(db, id=note_in.notebook_id, user=user)
+                notebook = crud.notebook.get_by_id_and_user(db, id=note_in.notebook_id, user=user)
             except HTTPException:
                 raise HTTPException(status_code=422, detail=[self.Errors.no_notebook])
-        
+
         rank = len(
             db.query(self.model)
             .filter(
@@ -32,6 +33,8 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
             note_in.label = f"Note {rank}"
         note = self.model(**note_in.dict(exclude_none=True), user_id=user.id, rank=rank)
 
+        notebook.edited_at = datetime.utcnow()
+        db.add(notebook)
         db.add(note)
         db.commit()
         db.refresh(note)
@@ -53,16 +56,22 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         self, db: Session, *, id: int, update: schemas.NoteUpdate, user: schemas.User
     ) -> schemas.Note:
         note = self.get(db, id)
-
         if not note or note.user_id != user.id:
             raise HTTPException(status_code=404)
 
         # validate notebook
         if update.notebook_id:
             try:
-                crud.notebook.get_by_id_and_user(db, id=update.notebook_id, user=user)
+                notebook = crud.notebook.get_by_id_and_user(
+                    db, id=update.notebook_id, user=user
+                )
             except HTTPException:
                 raise HTTPException(status_code=422, detail=[self.Errors.no_notebook])
+        else:
+            notebook = crud.notebook.get_by_id_and_user(db, id=note.notebook_id, user=user)
+        
+        notebook.edited_at = datetime.utcnow()
+        db.add(notebook)
 
         updated_note = super().update(db, db_obj=note, obj_in=update)
         return updated_note
