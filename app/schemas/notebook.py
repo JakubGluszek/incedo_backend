@@ -46,6 +46,6 @@ class NotebookUpdateRank(BaseModel):
     rank: int
 
 
-from app.schemas import NoteOut
+from app.schemas.note import NoteOut
 
 NotebookOut.update_forward_refs()

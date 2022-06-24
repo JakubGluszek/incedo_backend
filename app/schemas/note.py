@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, validator, Field
@@ -23,6 +24,7 @@ class Note(BaseModel):
     edited_at: datetime
     notebook_id: int
     user_id: int
+    notebook: Notebook
 
 
 class NoteOut(BaseModel):
@@ -40,3 +42,8 @@ class NoteOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+from app.schemas.notebook import Notebook
+
+Notebook.update_forward_refs()

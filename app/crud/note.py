@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 from fastapi import HTTPException
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from .base import CRUDBase
@@ -92,6 +93,21 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
 
         super().remove(db, id=id)
         return
+
+    def get_by_contains(
+        self, db: Session, *, user_id: int, query: str
+    ) -> List[schemas.Note]:
+        return (
+            db.query(self.model)
+            .filter(self.model.user_id == user_id)
+            .filter(
+                or_(
+                    func.lower(self.model.label).contains(func.lower(query)),
+                    func.lower(self.model.body).contains(func.lower(query)),
+                )
+            )
+            .all()
+        )
 
 
 note = CRUDNote(models.Note)

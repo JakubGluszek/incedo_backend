@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from sqlalchemy import or_, func
 from fastapi import HTTPException
 
 from .base import CRUDBase
-from app import models, schemas
+from app import models, schemas, crud
 
 
 class CRUDNotebook(
@@ -50,15 +51,31 @@ class CRUDNotebook(
         return notebook
 
     def get_multi(
-        self, db: Session, *, user_id: int, skip: int = 0, limit: int = 100
+        self,
+        db: Session,
+        *,
+        user_id: int,
+        search: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 100,
     ) -> List[schemas.Notebook]:
-        return (
-            db.query(self.model)
-            .filter(self.model.user_id == user_id)
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+        if not search:
+            return (
+                db.query(self.model)
+                .filter(self.model.user_id == user_id)
+                .offset(skip)
+                .limit(limit)
+                .all()
+            )
+
+        notebooks = []
+
+        notebooks += self.get_by_contains(db, user_id=user_id, query=search)
+        
+        notes = crud.note.get_by_contains(db, user_id=user_id, query=search)
+        for n in notes:
+            notebooks.append(n.notebook)
+        return set(notebooks)
 
     def remove(self, db: Session, *, id: int, user: schemas.User) -> None:
         notebook = self.get_by_id_and_user(db, id=id, user=user)
@@ -107,6 +124,21 @@ class CRUDNotebook(
         if len(notebooks) > 0:
             return notebooks[-1]
         return None
+
+    def get_by_contains(
+        self, db: Session, *, user_id: int, query: str
+    ) -> List[schemas.Notebook]:
+        return (
+            db.query(self.model)
+            .filter(self.model.user_id == user_id)
+            .filter(
+                or_(
+                    func.lower(self.model.label).contains(func.lower(query)),
+                    func.lower(self.model.about).contains(func.lower(query)),
+                )
+            )
+            .all()
+        )
 
 
 notebook = CRUDNotebook(models.Notebook)
