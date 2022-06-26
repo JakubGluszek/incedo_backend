@@ -47,7 +47,9 @@ class CRUDNotebook(
             raise HTTPException(status_code=404)
         # update
         notebook.edited_at = datetime.utcnow()
-        notebook = super().update(db, db_obj=notebook, obj_in=update)
+        notebook = super().update(
+            db, db_obj=notebook, obj_in=update.dict(exclude_none=True)
+        )
         return notebook
 
     def get_multi(
@@ -59,7 +61,7 @@ class CRUDNotebook(
         skip: int = 0,
         limit: int = 100,
     ) -> List[schemas.Notebook]:
-        if not search:
+        if not search or search == "null":
             return (
                 db.query(self.model)
                 .filter(self.model.user_id == user_id)
@@ -71,7 +73,7 @@ class CRUDNotebook(
         notebooks = []
 
         notebooks += self.get_by_contains(db, user_id=user_id, query=search)
-        
+
         notes = crud.note.get_by_contains(db, user_id=user_id, query=search)
         for n in notes:
             notebooks.append(n.notebook)

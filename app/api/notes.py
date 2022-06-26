@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.orm import Session
 
@@ -51,10 +51,21 @@ async def get_note(
 
 @router.get("", response_model=List[schemas.NoteOut])
 async def get_multi_notes(
+    search: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=0, le=100),
     current_user: schemas.User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    notes = crud.note.get_multi(db, user_id=current_user.id, skip=skip, limit=limit)
+    notes = crud.note.get_multi(db, user_id=current_user.id, search=search, skip=skip, limit=limit)
+    return notes
+
+
+@router.post("/ranks", response_model=List[schemas.NoteOut])
+async def update_notes_ranks(
+    update: schemas.NoteUpdateRank,
+    db: Session = Depends(deps.get_db),
+    current_user: schemas.User = Depends(deps.get_current_user),
+) -> Any:
+    notes = crud.note.update_rank(db, update=update, user=current_user)
     return notes
