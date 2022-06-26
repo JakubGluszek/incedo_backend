@@ -8,7 +8,7 @@ from app.core.config import settings
 
 
 class Token(Base):
-    token: str = Column(String, default=secrets.token_urlsafe(16), nullable=False)
+    token: str = Column(String(16), default=secrets.token_urlsafe(16), nullable=False)
     expires: datetime = Column(
         DateTime,
         default=(
@@ -16,7 +16,7 @@ class Token(Base):
         ),
         nullable=False,
     )
-    email: EmailStr = Column(String, unique=True, nullable=False)
+    email: EmailStr = Column(String(256), unique=True, nullable=False)
 
     @property
     def expired(self) -> bool:

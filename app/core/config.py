@@ -4,7 +4,6 @@ from typing import Optional, Dict, Any
 from pydantic import (
     BaseSettings,
     EmailStr,
-    PostgresDsn,
     validator,
 )
 
@@ -20,23 +19,17 @@ class Settings(BaseSettings):
     FRONTEND_HOST: str = os.getenv("FRONTEND_HOST")
 
     # Database
-    POSTGRES_SERVER: str
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_DB: str
-    DATABASE_URL: Optional[PostgresDsn] = None
+    DB_HOST: str
+    DB_NAME: str
+    DB_USER: str
+    DB_PASSWORD: str
+    DATABASE_URL: Optional[str] = None
 
     @validator("DATABASE_URL", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
-            return v.replace("postgres://", "postgresql://")
-        return PostgresDsn.build(
-            scheme="postgresql",
-            user=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWORD"),
-            host=values.get("POSTGRES_SERVER"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
-        )
+            return v
+        return f"mysql+pymysql://{values.get('DB_USER')}:{values.get('DB_PASSWORD')}@{values.get('DB_HOST')}/{values.get('DB_NAME')}"
 
     # User
     DEFAULT_AVATAR: str = f"{BACKEND_HOST}/static/images/avatars/default.png"

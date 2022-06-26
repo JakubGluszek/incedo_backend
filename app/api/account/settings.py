@@ -13,7 +13,8 @@ router = APIRouter()
 async def get_user_settings(
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    return current_user.settings
+    # fix
+    return
 
 
 @router.put("", response_model=schemas.UserSettingsOut)

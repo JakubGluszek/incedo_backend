@@ -33,17 +33,11 @@ import dotenv
 
 dotenv.load_dotenv()
 
+from app.core.config import settings
+
 
 def get_url():
-    database_url = os.getenv("DATABASE_URL")
-    print(database_url)
-    if database_url:
-        return database_url.replace("postgres://", "postgresql://")
-    user = os.getenv("POSTGRES_USER", "postgres")
-    password = os.getenv("POSTGRES_PASSWORD", "admin")
-    server = os.getenv("POSTGRES_SERVER", "localhost")
-    db = os.getenv("POSTGRES_DB", "incedo")
-    return f"postgresql://{user}:{password}@{server}/{db}"
+    return settings.DATABASE_URL
 
 
 def run_migrations_offline():
@@ -78,11 +72,11 @@ def run_migrations_online():
 
     """
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = get_url()
+    configuration["sqlalchemy.url"] = (
+        get_url() + "?ssl_key=" + "/etc/ssl/certs/ca-certificates.crt"
+    )
     connectable = engine_from_config(
-        configuration,
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+        configuration, prefix="sqlalchemy.", poolclass=pool.NullPool
     )
 
     with connectable.connect() as connection:
