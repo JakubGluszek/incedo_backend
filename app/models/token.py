@@ -8,7 +8,7 @@ from app.core.config import settings
 
 
 class Token(Base):
-    token: str = Column(String(16), default=secrets.token_urlsafe(16), nullable=False)
+    token: str = Column(String(32), default=secrets.token_urlsafe(16), nullable=False)
     expires: datetime = Column(
         DateTime,
         default=(

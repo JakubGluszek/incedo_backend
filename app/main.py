@@ -11,20 +11,10 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from app import api
 from app.core.config import JWTSettings, settings
 
-if settings.DEBUG:
-    origins = [
-        "http://127.0.0.1:3000",
-        "http://localhost:3000",
-        "http://0.0.0.0:3000",
-        "http://192.168.2.56:3000",
-    ]
-else:
-    origins = ["https://www.incedo.me"]
-
 middleware = [
     Middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=[settings.FRONTEND_HOST],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -48,7 +38,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 @AuthJWT.load_config
 def get_config():
     jwt_settings = JWTSettings()
-    if settings.DEBUG:
+    if settings.DEVELOPMENT:
         del jwt_settings.authjwt_cookie_domain
     return jwt_settings
 

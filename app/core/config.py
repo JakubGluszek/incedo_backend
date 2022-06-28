@@ -14,8 +14,8 @@ dotenv.load_dotenv()
 class Settings(BaseSettings):
     # General
     PROJECT_NAME: str = "Incedo"
-    DEBUG: bool = False
-    BACKEND_HOST: str = os.getenv("BACKEND_HOST")
+    DEVELOPMENT: bool = False
+    HOST: str = os.getenv("HOST")
     FRONTEND_HOST: str = os.getenv("FRONTEND_HOST")
 
     # Database
@@ -32,7 +32,7 @@ class Settings(BaseSettings):
         return f"mysql+pymysql://{values.get('DB_USER')}:{values.get('DB_PASSWORD')}@{values.get('DB_HOST')}/{values.get('DB_NAME')}"
 
     # User
-    DEFAULT_AVATAR: str = f"{BACKEND_HOST}/static/images/avatars/default.png"
+    DEFAULT_AVATAR: str = f"{HOST}/static/images/avatars/default.png"
     FIRST_USER_USERNAME: str
     FIRST_USER_EMAIL: str
 

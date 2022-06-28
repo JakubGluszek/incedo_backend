@@ -3,22 +3,12 @@ from fastapi import APIRouter, BackgroundTasks, Body, Depends, Request
 from fastapi.responses import RedirectResponse, Response, JSONResponse
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
-from authlib.integrations.starlette_client import OAuth
-from starlette.config import Config
 from fastapi_jwt_auth import AuthJWT
 
 from app import schemas, services
 from app.api import deps
 from app.core.config import settings
-
-
-config = Config(".env")
-oauth = OAuth(config)
-oauth.register(
-    name="google",
-    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-    client_kwargs={"scope": "openid email"},
-)
+from app.utils.oauth import oauth
 
 
 router = APIRouter()

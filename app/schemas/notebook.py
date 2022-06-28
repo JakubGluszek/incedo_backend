@@ -37,6 +37,7 @@ class NotebookOut(BaseModel):
         return int(v.timestamp())
 
     notes: List[NoteOut]
+
     class Config:
         orm_mode = True
 

@@ -6,7 +6,9 @@ from app import crud, schemas
 from app.utils import mail
 
 
-def create_user(db: Session, *, user_in: schemas.UserCreate, is_super: bool = False) -> schemas.User:
+def create_user(
+    db: Session, *, user_in: schemas.UserCreate, is_super: bool = False
+) -> schemas.User:
     user = crud.user.create(db, user_in=user_in, is_super=is_super)
     crud.user_settings.create(db, user=user)
     return user
@@ -40,7 +42,7 @@ def sign_in(db: Session, *, token_in: str) -> schemas.User:
 def sign_in_via_google(db: Session, *, code: dict) -> schemas.User:
     email = code["userinfo"]["email"]
     user = crud.user.get_by_email(db, email)
-    
+
     if not user:
         user_in = schemas.UserCreate(email=email)
         create_user(db, user_in=user_in)

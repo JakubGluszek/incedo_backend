@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
-if settings.DEBUG:
+if settings.DEVELOPMENT:
     engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
 else:
     ssl_args = {"ssl_ca": "/etc/ssl/certs/ca-certificates.crt"}

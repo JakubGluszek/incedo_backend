@@ -57,7 +57,9 @@ async def get_multi_notes(
     current_user: schemas.User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    notes = crud.note.get_multi(db, user_id=current_user.id, search=search, skip=skip, limit=limit)
+    notes = crud.note.get_multi(
+        db, user_id=current_user.id, search=search, skip=skip, limit=limit
+    )
     return notes
 
 
