@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  backend:
+    build: .
+    image: incedo
+    container_name: incedo
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    restart: always
+    ports:
+      - 8000:8000
+
+    volumes:
+      - ./app:/code/app
