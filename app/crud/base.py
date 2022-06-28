@@ -69,3 +69,16 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         if not db_obj:
             raise HTTPException(status_code=404)
         return db_obj
+
+    def remove_all_by_user_id(self, db: Session, *, user_id: int) -> None:
+        objects = db.query(self.model).filter(self.model.user_id == user_id).all()
+        for obj in objects:
+            db.delete(obj)
+        db.commit()
+        return
+
+    def remove_by_user_id(self, db: Session, *, user_id: int) -> None:
+        obj = db.query(self.model).filter(self.model.user_id == user_id).first()
+        db.delete(obj)
+        db.commit()
+        return

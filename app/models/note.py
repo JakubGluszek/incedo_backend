@@ -8,7 +8,7 @@ from app.db.base import Base
 class Note(Base):
     id: int = Column(Integer, primary_key=True)
     label: Optional[str] = Column(String(64), nullable=True)
-    body: str = Column(Text, nullable=False)
+    body: str = Column(Text, nullable=True)
     rank: int = Column(Integer, nullable=False)
     created_at: datetime = Column(DateTime, default=datetime.utcnow)
     edited_at: datetime = Column(DateTime, default=datetime.utcnow)

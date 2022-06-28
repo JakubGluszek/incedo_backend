@@ -1,4 +1,3 @@
-from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, validator, Field
@@ -6,6 +5,7 @@ from pydantic import BaseModel, validator, Field
 
 class NoteCreate(BaseModel):
     label: str = Field(None, max_length=64)
+    body: Optional[str] = ""
     notebook_id: int
 
 
@@ -24,7 +24,6 @@ class Note(BaseModel):
     edited_at: datetime
     notebook_id: int
     user_id: int
-    notebook: Notebook
 
 
 class NoteOut(BaseModel):
@@ -47,8 +46,3 @@ class NoteOut(BaseModel):
 class NoteUpdateRank(BaseModel):
     id: int
     rank: int
-
-
-from app.schemas.notebook import Notebook
-
-Notebook.update_forward_refs()

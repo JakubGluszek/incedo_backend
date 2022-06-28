@@ -163,5 +163,12 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
             return notes[-1]
         return None
 
+    def remove_multi_by_notebook_id(self, db: Session, *, notebook_id: int) -> None:
+        notes = db.query(self.model).filter(self.model.notebook_id == notebook_id).all()
+        for note in notes:
+            db.delete(note)
+        db.commit()
+        return
+
 
 note = CRUDNote(models.Note)

@@ -32,7 +32,7 @@ def sign_in(db: Session, *, token_in: str) -> schemas.User:
     user = crud.user.get_by_email(db, token.email)
     if not user:
         user_in = schemas.UserCreate(email=token.email)
-        create_user(db, user_in=user_in)
+        user = create_user(db, user_in=user_in)
 
     crud.token.remove_by_email(db, token.email)
 
@@ -48,3 +48,15 @@ def sign_in_via_google(db: Session, *, code: dict) -> schemas.User:
         create_user(db, user_in=user_in)
 
     return user
+
+
+def delete_account(db: Session, *, user_id: int) -> None:
+    user = crud.user.get(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404)
+
+    crud.note.remove_all_by_user_id(db, user_id=user_id)
+    crud.notebook.remove_all_by_user_id(db, user_id=user_id)
+    crud.user_settings.remove_by_user_id(db, user_id=user_id)
+    crud.user.remove(db, id=user_id)
+    return

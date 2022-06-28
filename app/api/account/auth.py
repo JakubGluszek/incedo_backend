@@ -20,7 +20,7 @@ async def get_token_via_email(
     email: EmailStr = Body(..., embed=True),
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    services.create_and_send_token(db, email=email, bg=bg)
+    services.account.create_and_send_token(db, email=email, bg=bg)
     return
 
 
@@ -31,7 +31,7 @@ async def sign_in(
     db: Session = Depends(deps.get_db),
     Authorize: AuthJWT = Depends(),
 ) -> Any:
-    user = services.sign_in(db, token_in=token)
+    user = services.account.sign_in(db, token_in=token)
 
     access_token = Authorize.create_access_token(subject=user.id)
     refresh_token = Authorize.create_refresh_token(subject=user.id)
@@ -53,7 +53,7 @@ async def sign_in_via_google_callback(
     request: Request, db: Session = Depends(deps.get_db), Authorize: AuthJWT = Depends()
 ) -> Any:
     code = await oauth.google.authorize_access_token(request)
-    user = services.sign_in_via_google(db, code=code)
+    user = services.account.sign_in_via_google(db, code=code)
 
     response = RedirectResponse(settings.FRONTEND_HOST)
 

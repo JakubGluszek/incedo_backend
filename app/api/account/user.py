@@ -2,7 +2,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
-from app import schemas, crud
+from app import schemas, services
 from app.api import deps
 
 
@@ -21,5 +21,5 @@ async def remove_current_user(
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    crud.user.remove(db, user=current_user)
+    services.account.delete_account(db, user_id=current_user.id)
     return

@@ -1,6 +1,5 @@
-from __future__ import annotations
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel, Field, validator
 
 
@@ -36,8 +35,6 @@ class NotebookOut(BaseModel):
     def convert_to_timestamp(cls, v: datetime) -> int:
         return int(v.timestamp())
 
-    notes: List[NoteOut]
-
     class Config:
         orm_mode = True
 
@@ -45,8 +42,3 @@ class NotebookOut(BaseModel):
 class NotebookUpdateRank(BaseModel):
     id: int
     rank: int
-
-
-from app.schemas.note import NoteOut
-
-NotebookOut.update_forward_refs()

@@ -40,10 +40,5 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
             .first()
         )
 
-    def remove(self, db: Session, user: schemas.User) -> None:
-        db.delete(user)
-        db.commit()
-        return
-
 
 user = CRUDUser(models.User)

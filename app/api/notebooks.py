@@ -2,7 +2,7 @@ from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app import crud, schemas, services
 from app.api import deps
 
 
@@ -42,7 +42,7 @@ async def remove_notebooks(
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    crud.notebook.remove(db, id=notebook_id, user=current_user)
+    services.notebook.remove_notebook(db, notebook_id=notebook_id, user=current_user)
     return
 
 
