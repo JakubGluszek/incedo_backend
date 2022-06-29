@@ -44,7 +44,9 @@ async def sign_in(
 
 @router.get("/signin/google")
 async def sign_in_via_google(request: Request) -> Any:
-    redirect_uri = request.url_for("sign_in_via_google_callback")
+    redirect_uri = request.url_for("sign_in_via_google_callback").replace(
+        "http", "https"
+    )
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
