@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from app import schemas
 from app.db.base import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
@@ -27,17 +26,54 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def get(self, db: Session, id: Any) -> Optional[ModelType]:
         return db.query(self.model).filter(self.model.id == id).first()
 
+    def get_by_id_and_user_id(self, db: Session, *, id: int, user_id: int) -> ModelType:
+        """
+        Throws 404 if model not found or model.user_id != user_id
+        """
+        db_obj = (
+            db.query(self.model)
+            .filter(self.model.id == id, self.model.user_id == user_id)
+            .first()
+        )
+        if not db_obj:
+            raise HTTPException(status_code=404)
+        return db_obj
+
+    def remove_multi(
+        self, db: Session, *, objects_ids: List[int], user_id: int
+    ) -> None:
+        objects = (
+            db.query(self.model)
+            .filter(self.model.id.in_(objects_ids), self.model.user_id == user_id)
+            .all()
+        )
+        for obj in objects:
+            db.delete(obj)
+        db.commit()
+        return
+
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+        self,
+        db: Session,
+        *,
+        user_id: int,
+        skip: int = 0,
+        limit: int = 100,
     ) -> List[ModelType]:
-        return db.query(self.model).offset(skip).limit(limit).all()
+        return (
+            db.query(self.model)
+            .filter(self.model.user_id == user_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     def update(
         self,
         db: Session,
         *,
         db_obj: ModelType,
-        obj_in: Union[UpdateSchemaType, Dict[str, Any]]
+        obj_in: Union[UpdateSchemaType, Dict[str, Any]],
     ) -> ModelType:
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
@@ -52,33 +88,21 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.refresh(db_obj)
         return db_obj
 
-    def remove(self, db: Session, *, id: int) -> ModelType:
+    def remove(self, db: Session, id: int) -> ModelType:
         obj = db.query(self.model).get(id)
         db.delete(obj)
         db.commit()
         return obj
 
-    def get_by_id_and_user(
-        self, db: Session, *, id: int, user: schemas.User
-    ) -> ModelType:
-        db_obj = (
-            db.query(self.model)
-            .filter(self.model.id == id, self.model.user_id == user.id)
-            .first()
-        )
-        if not db_obj:
-            raise HTTPException(status_code=404)
-        return db_obj
+    def remove_by_user_id(self, db: Session, *, user_id: int) -> None:
+        obj = db.query(self.model).filter(self.model.user_id == user_id).first()
+        db.delete(obj)
+        db.commit()
+        return
 
     def remove_all_by_user_id(self, db: Session, *, user_id: int) -> None:
         objects = db.query(self.model).filter(self.model.user_id == user_id).all()
         for obj in objects:
             db.delete(obj)
-        db.commit()
-        return
-
-    def remove_by_user_id(self, db: Session, *, user_id: int) -> None:
-        obj = db.query(self.model).filter(self.model.user_id == user_id).first()
-        db.delete(obj)
         db.commit()
         return

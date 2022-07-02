@@ -1,10 +1,5 @@
-from .user import User, UserCreate, UserUpdate, UserOut
-from .note import NoteCreate, NoteUpdate, Note, NoteOut, NoteUpdateRank
-from .notebook import (
-    NotebookCreate,
-    NotebookUpdate,
-    Notebook,
-    NotebookOut,
-    NotebookUpdateRank,
-)
-from .user_settings import UserSettingsUpdate, UserSettings, UserSettingsOut
+from .user import *
+from .note import *
+from .notebook import *
+from .user_settings import *
+from .notebook_with_notes import *

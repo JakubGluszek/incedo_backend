@@ -22,7 +22,7 @@ class Note(BaseModel):
     rank: int
     created_at: datetime
     edited_at: datetime
-    notebook_id: int
+    notebook_id: Optional[int]
     user_id: int
 
 
@@ -33,7 +33,7 @@ class NoteOut(BaseModel):
     rank: int
     created_at: int
     edited_at: int
-    notebook_id: int
+    notebook_id: Optional[int]
 
     @validator("created_at", "edited_at", pre=True)
     def convert_to_timestamp(cls, v: datetime) -> int:
@@ -43,6 +43,6 @@ class NoteOut(BaseModel):
         orm_mode = True
 
 
-class NoteUpdateRank(BaseModel):
+class NoteNewRank(BaseModel):
     id: int
     rank: int
