@@ -3,38 +3,22 @@
 ## TODO
 
 * [ ] Notebooks
-  * [x] Create
-  * [x] Read
-  * [x] Update
-  * [x] Delete
-    * [x] Delete specific notebook
-    * [x] Delete multiple notebooks
-
-      Cascade delete sub-notebooks  
-      Leave orphaned notes so that they can either be:
-
-      * restored by user
-      * deleted automatically
-      * deleted manually by user
-
-  * [x] Sub notebooks (aka sections)
-  * [x] Custom sort order
   * [ ] Share
-  * [x] Search
 
-    Return a notebook if at least one attribute contains the search query:
+* [ ] Notes
+  * [ ] Share
 
-    * notebook's label
-    * related note's label
-    * related note's body
+* [ ] Write **proper** tests
+  * [ ] auth
+  * [ ] settings
+  * [ ] user
+  * [ ] notebooks
+  * [ ] notes
 
-  * [ ] Notes
-    * [x] Create
-    * [x] Read
-    * [x] Update
-    * [x] Delete
-      * [x] Delete specific note
-      * [x] Delete multiple multiple notes
-    * [x] Custom sort order
-    * [ ] Share
-    * [x] Search
+* [ ] Write bash scripts for initializing tests, make it docker friendly.
+* [ ] Figure out how to start & stop the server on heroku in a wise & bugless manner.
+* [ ] Figure out the best way to encrypt data || have it be stored on client's computer so that only the client can read his own data.
+* [ ] Handle avatar img storing / updating.
+* [ ] Migrate frontend to next js
+  * [ ] Maximize SEO
+  * [ ] Utilize render methods

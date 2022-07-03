@@ -26,6 +26,7 @@ class User(BaseModel):
 
 class UserOut(BaseModel):
     username: str
+    email: EmailStr
     avatar: HttpUrl
     is_super: bool
 
