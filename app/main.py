@@ -9,6 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app import api
 from app.core.config import settings
+from app.db.utils import check_db_connected
 
 middleware = [
     Middleware(
@@ -32,6 +33,11 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     if exc.message == "Signature has expired":
         return Response(status_code=403)
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
+
+
+@app.on_event("startup")
+async def app_startup():
+    await check_db_connected()
 
 
 if __name__ == "__main__":

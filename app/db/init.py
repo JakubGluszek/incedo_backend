@@ -1,4 +1,5 @@
 import logging
+from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
 
@@ -10,13 +11,15 @@ logger = logging.getLogger(__name__)
 
 
 def init_db(db: Session) -> None:
-    # Tables are created using Alembic migrations
     init_admin_account(db)
     return
 
 
 def init_admin_account(db: Session) -> None:
     user_in = schemas.UserCreate(email=settings.FIRST_USER_EMAIL)
-    services.create_user(db, user_in=user_in, is_super=True)
-    logger.info("Admin account created")
+    try:
+        services.account.create_user(db, user_in=user_in, is_super=True)
+        logger.info("Admin initialized")
+    except HTTPException as e:
+        logger.info("Admin already initialized")
     return
