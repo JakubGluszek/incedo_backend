@@ -1,7 +1,8 @@
 import os
+from typing import Any, Dict
+
 import emails
 from emails.template import JinjaTemplate
-from typing import Dict, Any
 
 from app.core.config import settings
 

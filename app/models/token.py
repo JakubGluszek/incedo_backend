@@ -1,10 +1,11 @@
 import secrets
-from sqlalchemy import Column, String, DateTime
 from datetime import datetime, timedelta
-from pydantic import EmailStr
 
-from app.db.base import Base
+from pydantic import EmailStr
+from sqlalchemy import Column, DateTime, String
+
 from app.core.config import settings
+from app.db.base import Base
 
 
 class Token(Base):

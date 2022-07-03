@@ -1,9 +1,9 @@
 import logging
+
 from sqlalchemy.orm import Session
 
-from app import services, schemas
+from app import schemas, services
 from app.core.config import settings
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

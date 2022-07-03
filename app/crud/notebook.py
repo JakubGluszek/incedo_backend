@@ -1,11 +1,13 @@
 from datetime import datetime
 from typing import List, Optional
+
 from fastapi import HTTPException
 from sqlalchemy import func, or_
-from sqlalchemy.orm import Session, Query 
+from sqlalchemy.orm import Session
+
+from app import models, schemas
 
 from .base import CRUDBase
-from app import models, schemas
 
 
 class CRUDNotebook(

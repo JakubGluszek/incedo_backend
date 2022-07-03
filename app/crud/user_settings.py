@@ -1,8 +1,10 @@
 from typing import Optional
+
 from sqlalchemy.orm import Session
 
-from .base import CRUDBase
 from app import models, schemas
+
+from .base import CRUDBase
 
 
 class CRUDUserSettings(CRUDBase[models.UserSettings, None, schemas.UserSettingsUpdate]):

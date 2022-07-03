@@ -1,4 +1,5 @@
 from typing import Generator
+
 from fastapi import Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session

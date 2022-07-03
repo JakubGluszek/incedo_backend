@@ -1,9 +1,10 @@
 import json
+
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.tests.utils.account import create_user, create_token
+from app.tests.utils.account import create_token, create_user
 
 
 def test_get_token_via_email(client: TestClient) -> None:

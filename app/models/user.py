@@ -1,5 +1,5 @@
 from pydantic import EmailStr
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Boolean, Column, Integer, String
 
 from app.core.config import settings
 from app.db.base import Base

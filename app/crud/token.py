@@ -1,10 +1,12 @@
 from typing import Optional
+
 from pydantic import EmailStr
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from .base import CRUDBase
 from app import models
+
+from .base import CRUDBase
 
 
 class CRUDToken(CRUDBase[models.Token, None, None]):

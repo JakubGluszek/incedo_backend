@@ -1,11 +1,13 @@
 from typing import Optional
+
+from fastapi import HTTPException
 from pydantic import EmailStr
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
+
+from app import models, schemas
 
 from .base import CRUDBase
-from app import models, schemas
 
 
 class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):

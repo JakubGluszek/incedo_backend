@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 from typing import Optional
-from pydantic import BaseModel, EmailStr, HttpUrl, Field
+
+from pydantic import BaseModel, EmailStr, Field, HttpUrl
 
 
 class UserCreate(BaseModel):

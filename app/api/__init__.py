@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 from fastapi_jwt_auth import AuthJWT
 
-from . import account, notebooks, notes
 from app.core.config import JWTSettings, settings
+
+from . import account, notebooks, notes
 
 router = APIRouter()
 router.include_router(account.router, prefix="/account", tags=["Account"])

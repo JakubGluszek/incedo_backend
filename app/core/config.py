@@ -1,12 +1,8 @@
 import os
-import dotenv
-from typing import Optional, Dict, Any
-from pydantic import (
-    BaseSettings,
-    EmailStr,
-    validator,
-)
+from typing import Any, Dict, Optional
 
+import dotenv
+from pydantic import BaseSettings, EmailStr, validator
 
 dotenv.load_dotenv()
 

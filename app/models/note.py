@@ -1,7 +1,8 @@
-from typing import Optional
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime
-from sqlalchemy.orm import relationship, backref
+from typing import Optional
+
+from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy.orm import backref, relationship
 
 from app.db.base import Base
 

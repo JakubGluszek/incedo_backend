@@ -1,10 +1,10 @@
 from typing import Any
+
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
 from app import schemas, services
 from app.api import deps
-
 
 router = APIRouter()
 

@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-from . import auth, user, settings
-
+from . import auth, settings, user
 
 router = APIRouter()
 

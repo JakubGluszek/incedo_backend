@@ -1,11 +1,13 @@
 from datetime import datetime
 from typing import List, Optional
+
 from fastapi import HTTPException
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
+from app import crud, models, schemas
+
 from .base import CRUDBase
-from app import models, schemas, crud
 
 
 class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
@@ -87,7 +89,7 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
             q = q.filter(self.model.notebook_id.is_(None))
         else:
             q = q.filter(self.model.notebook_id.isnot(None))
-            
+
         if search:
             q = q.filter(
                 or_(
@@ -95,7 +97,6 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
                     func.lower(self.model.body.contains(func.lower(search))),
                 )
             )
-            
 
         if sort == "rank":
             q = q.order_by(self.model.rank)

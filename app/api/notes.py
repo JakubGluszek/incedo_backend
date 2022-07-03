@@ -1,9 +1,11 @@
 from typing import Any, List, Optional
+
 from fastapi import APIRouter, Body, Depends, Query, Response
 from sqlalchemy.orm import Session
 
-from . import deps
 from app import crud, schemas
+
+from . import deps
 
 router = APIRouter()
 

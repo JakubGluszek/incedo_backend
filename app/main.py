@@ -2,10 +2,10 @@ import uvicorn
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi_jwt_auth.exceptions import AuthJWTException
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app import api
 from app.core.config import settings

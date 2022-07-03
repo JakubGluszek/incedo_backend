@@ -1,6 +1,7 @@
 from typing import List
-from .notebook import NotebookOut
+
 from .note import NoteOut
+from .notebook import NotebookOut
 
 
 class NotebookWithNotes(NotebookOut):

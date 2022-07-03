@@ -1,7 +1,8 @@
 # credit - https://www.fastapitutorial.com/blog/unit-testing-in-fastapi/
 
-from typing import Any
-from typing import Generator
+import os
+import sys
+from typing import Any, Generator
 
 import pytest
 from fastapi import FastAPI
@@ -9,15 +10,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import sys
-import os
-
 # this is to include backend dir in sys.path so that we can import from db,main.py
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import api
-from app.db.base import Base
 from app.api.deps import get_db
+from app.db.base import Base
 
 
 def start_application():

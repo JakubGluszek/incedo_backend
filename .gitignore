@@ -4,3 +4,4 @@ hide-files.json
 **/__pycache__/
 .vscode/
 test_db.db
+.pytest_cache
