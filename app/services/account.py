@@ -6,7 +6,7 @@ from app import crud, schemas
 from app.utils import mail
 
 
-def create_user(
+def create_account(
     db: Session, *, user_in: schemas.UserCreate, is_super: bool = False
 ) -> schemas.User:
     user = crud.user.create(db, user_in=user_in, is_super=is_super)
@@ -32,7 +32,7 @@ def sign_in(db: Session, *, token_in: str) -> schemas.User:
     user = crud.user.get_by_email(db, token.email)
     if not user:
         user_in = schemas.UserCreate(email=token.email)
-        user = create_user(db, user_in=user_in)
+        user = create_account(db, user_in=user_in)
 
     crud.token.remove_by_email(db, token.email)
 
@@ -45,7 +45,7 @@ def sign_in_via_google(db: Session, *, code: dict) -> schemas.User:
 
     if not user:
         user_in = schemas.UserCreate(email=email)
-        create_user(db, user_in=user_in)
+        create_account(db, user_in=user_in)
 
     return user
 
@@ -56,7 +56,7 @@ def delete_account(db: Session, *, user_id: int) -> None:
         raise HTTPException(status_code=404)
 
     crud.note.remove_all_by_user_id(db, user_id=user_id)
-    crud.notebook.remove_all_by_user_id(db, user_id=user_id)
+    crud.note_folder.remove_all_by_user_id(db, user_id=user_id)
     crud.user_settings.remove_by_user_id(db, user_id=user_id)
     crud.user.remove(db, id=user_id)
     return

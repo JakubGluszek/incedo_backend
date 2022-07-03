@@ -20,13 +20,13 @@ async def create_note(
     return note
 
 
-@router.get("/{note_id}", response_model=schemas.NoteOut)
+@router.get("/{id}", response_model=schemas.NoteOut)
 async def get_note(
-    note_id: int,
+    id: int,
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    note = crud.note.get_by_id_and_user_id(db, id=note_id, user_id=current_user.id)
+    note = crud.note.get_by_id_and_user_id(db, id=id, user_id=current_user.id)
     return note
 
 
@@ -39,7 +39,7 @@ async def get_multi_notes(
     limit: int = Query(100, ge=0, le=100),
     orphaned: bool = Query(
         False,
-        description="Get multi notes with notebook_id == null. These notes are scheduled for deletion.",
+        description="Get multi notes with note_folder_id == null. These notes are scheduled for deletion.",
     ),
     current_user: schemas.User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),

@@ -12,29 +12,32 @@ from .base import CRUDBase
 
 class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
     class Errors:
-        no_notebook = {"loc": ["body", "notebook_id"], "msg": "Notebook not found"}
+        no_note_folder = {
+            "loc": ["body", "note_folder_id"],
+            "msg": "NoteFolder not found",
+        }
         not_found_422 = {"loc": ["body", "id"], "msg": "Note not found."}
 
     def create(
         self, db: Session, *, note_in: schemas.NoteCreate, user_id: int
     ) -> schemas.Note:
-        # validate notebook
+        # validate note_folder
         try:
-            notebook = crud.notebook.get_by_id_and_user_id(
-                db, id=note_in.notebook_id, user_id=user_id
+            note_folder = crud.note_folder.get_by_id_and_user_id(
+                db, id=note_in.note_folder_id, user_id=user_id
             )
         except HTTPException:
-            raise HTTPException(status_code=422, detail=[self.Errors.no_notebook])
+            raise HTTPException(status_code=422, detail=[self.Errors.no_note_folder])
 
-        rank = self.generate_rank(db, notebook_id=notebook.id)
+        rank = self.generate_rank(db, note_folder_id=note_folder.id)
 
         if not note_in.label:
             note_in.label = f"Note {rank + 1}"
 
         note = self.model(**note_in.dict(exclude_none=True), user_id=user_id, rank=rank)
 
-        notebook.edited_at = datetime.utcnow()
-        db.add(notebook)
+        note_folder.edited_at = datetime.utcnow()
+        db.add(note_folder)
         db.add(note)
         db.commit()
         db.refresh(note)
@@ -48,25 +51,27 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         if not note or note.user_id != user_id:
             raise HTTPException(status_code=404)
 
-        # validate notebook
-        if update.notebook_id:
+        # validate note_folder
+        if update.note_folder_id:
             try:
-                notebook = crud.notebook.get_by_id_and_user_id(
-                    db, id=update.notebook_id, user_id=user_id
+                note_folder = crud.note_folder.get_by_id_and_user_id(
+                    db, id=update.note_folder_id, user_id=user_id
                 )
             except HTTPException:
-                raise HTTPException(status_code=422, detail=[self.Errors.no_notebook])
+                raise HTTPException(
+                    status_code=422, detail=[self.Errors.no_note_folder]
+                )
         else:
-            notebook = crud.notebook.get_by_id_and_user_id(
-                db, id=note.notebook_id, user_id=user_id
+            note_folder = crud.note_folder.get_by_id_and_user_id(
+                db, id=note.note_folder_id, user_id=user_id
             )
 
         edited_at = datetime.utcnow()
 
-        notebook.edited_at = edited_at
+        note_folder.edited_at = edited_at
         note.edited_at = edited_at
 
-        db.add(notebook)
+        db.add(note_folder)
 
         updated_note = super().update(db, db_obj=note, obj_in=update)
         return updated_note
@@ -86,9 +91,9 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         q = db.query(self.model).filter(self.model.user_id == user_id)
 
         if orphaned:
-            q = q.filter(self.model.notebook_id.is_(None))
+            q = q.filter(self.model.note_folder_id.is_(None))
         else:
-            q = q.filter(self.model.notebook_id.isnot(None))
+            q = q.filter(self.model.note_folder_id.isnot(None))
 
         if search:
             q = q.filter(
@@ -109,24 +114,28 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         return notes
 
     def remove(self, db: Session, id: int, user_id: int) -> None:
-        notebook = self.get_by_id_and_user_id(db, id=id, user_id=user_id)
-        db.delete(notebook)
+        note_folder = self.get_by_id_and_user_id(db, id=id, user_id=user_id)
+        db.delete(note_folder)
         db.commit()
         return
 
-    def remove_all_by_notebook_id(self, db: Session, *, notebook_id: int) -> None:
-        notes = db.query(self.model).filter(self.model.notebook_id == notebook_id).all()
+    def remove_all_by_note_folder_id(self, db: Session, *, note_folder_id: int) -> None:
+        notes = (
+            db.query(self.model)
+            .filter(self.model.note_folder_id == note_folder_id)
+            .all()
+        )
         for note in notes:
             db.delete(note)
         db.commit()
         return
 
-    def generate_rank(self, db: Session, notebook_id: Optional[int]) -> int:
-        # determine custom order rank based on number of sibling notebooks
+    def generate_rank(self, db: Session, note_folder_id: Optional[int]) -> int:
+        # determine custom order rank based on number of sibling note_folders
         return len(
             db.query(self.model)
             .filter(
-                self.model.notebook_id == notebook_id,
+                self.model.note_folder_id == note_folder_id,
             )
             .all()
         )
@@ -144,7 +153,7 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
             db.query(self.model)
             .filter(
                 self.model.rank.in_([i for i in range(start, end + 1)]),
-                self.model.notebook_id == note.notebook_id,
+                self.model.note_folder_id == note.note_folder_id,
                 self.model.user_id == user_id,
             )
             .all()

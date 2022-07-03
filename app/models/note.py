@@ -14,14 +14,14 @@ class Note(Base):
     rank: int = Column(Integer, nullable=False)
     created_at: datetime = Column(DateTime, default=datetime.utcnow)
     edited_at: datetime = Column(DateTime, default=datetime.utcnow)
-    notebook_id: int = Column(Integer, nullable=True)
+    note_folder_id: int = Column(Integer, nullable=True)
     user_id: int = Column(Integer, nullable=False)
 
-    notebook = relationship(
-        "Notebook",
+    note_folder = relationship(
+        "NoteFolder",
         backref=backref("notes"),
-        foreign_keys=[notebook_id],
-        primaryjoin="Notebook.id == Note.notebook_id",
+        foreign_keys=[note_folder_id],
+        primaryjoin="NoteFolder.id == Note.note_folder_id",
     )
 
     def __repr__(self):

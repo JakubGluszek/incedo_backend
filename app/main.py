@@ -37,8 +37,4 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 @app.on_event("startup")
 async def app_startup():
-    await check_db_connected()
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    check_db_connected()

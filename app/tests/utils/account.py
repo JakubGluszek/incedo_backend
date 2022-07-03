@@ -1,8 +1,9 @@
 import json
 from typing import Dict
+
+from fastapi.testclient import TestClient
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
-from fastapi.testclient import TestClient
 
 from app import crud, schemas, services
 from app.core.config import settings

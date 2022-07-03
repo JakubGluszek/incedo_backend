@@ -24,7 +24,7 @@ async def get_token_via_email(
     return
 
 
-@router.post("/signin", response_model=schemas.UserOut)
+@router.post("/signin", response_model=schemas.Tokens)
 async def sign_in(
     response: JSONResponse,
     token: str = Body(..., embed=True),
@@ -39,7 +39,7 @@ async def sign_in(
     Authorize.set_access_cookies(access_token, response)
     Authorize.set_refresh_cookies(refresh_token, response)
 
-    return user
+    return {"access_token": access_token, "refresh_token": refresh_token}
 
 
 @router.get("/signin/google")
@@ -67,7 +67,11 @@ async def sign_in_via_google_callback(
     return response
 
 
-@router.post("/refresh")
+@router.post(
+    "/refresh",
+    response_model=schemas.Tokens,
+    response_model_exclude={"refresh_token"},
+)
 async def refresh_token(Authorize: AuthJWT = Depends()) -> Any:
     Authorize.jwt_refresh_token_required()
 
@@ -78,4 +82,4 @@ async def refresh_token(Authorize: AuthJWT = Depends()) -> Any:
 
     Authorize.set_access_cookies(new_access_token, response)
 
-    return response
+    return {"access_token": new_access_token, "refresh_token": None}

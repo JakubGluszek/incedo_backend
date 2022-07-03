@@ -9,32 +9,32 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.post("", response_model=schemas.NotebookOut)
-async def create_notebooks(
-    notebook_in: schemas.NotebookCreate,
+@router.post("", response_model=schemas.NoteFolderOut)
+async def create_note_folders(
+    note_folder_in: schemas.NoteFolderCreate,
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    notebook = crud.notebook.create(
-        db, notebook_in=notebook_in, user_id=current_user.id
+    note_folder = crud.note_folder.create(
+        db, note_folder_in=note_folder_in, user_id=current_user.id
     )
-    return notebook
+    return note_folder
 
 
-@router.get("/{notebook_id}", response_model=schemas.NotebookWithNotes)
-async def get_notebook(
-    notebook_id: int,
+@router.get("/{id}", response_model=schemas.NoteFolderWithNotes)
+async def get_note_folder(
+    id: int,
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    notebook = crud.notebook.get_by_id_and_user_id(
-        db, id=notebook_id, user_id=current_user.id
+    note_folder = crud.note_folder.get_by_id_and_user_id(
+        db, id=id, user_id=current_user.id
     )
-    return notebook
+    return note_folder
 
 
-@router.get("", response_model=List[schemas.NotebookOut])
-async def get_multi_notebooks(
+@router.get("", response_model=List[schemas.NoteFolderOut])
+async def get_multi_note_folders(
     search: Optional[str] = None,
     sort: Optional[str] = None,
     order: Optional[str] = None,
@@ -43,7 +43,7 @@ async def get_multi_notebooks(
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    notebooks = crud.notebook.get_multi(
+    note_folders = crud.note_folder.get_multi(
         db,
         user_id=current_user.id,
         search=search,
@@ -52,49 +52,51 @@ async def get_multi_notebooks(
         skip=skip,
         limit=limit,
     )
-    return notebooks
+    return note_folders
 
 
-@router.put("/{notebook_id}", response_model=schemas.NotebookOut)
-async def update_notebooks(
-    notebook_id: int,
-    update: schemas.NotebookUpdate,
+@router.put("/{id}", response_model=schemas.NoteFolderOut)
+async def update_note_folders(
+    id: int,
+    update: schemas.NoteFolderUpdate,
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    notebook = crud.notebook.update(
-        db, id=notebook_id, update=update, user_id=current_user.id
+    note_folder = crud.note_folder.update(
+        db, id=id, update=update, user_id=current_user.id
     )
-    return notebook
+    return note_folder
 
 
-@router.delete("/{notebook_id}", status_code=204, response_class=Response)
-async def remove_notebook(
-    notebook_id: int,
+@router.delete("/{id}", status_code=204, response_class=Response)
+async def remove_note_folder(
+    id: int,
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    crud.notebook.remove_notebook_cascade(
-        db, notebook_id=notebook_id, user_id=current_user.id
+    crud.note_folder.remove_note_folder_cascade(
+        db, id=id, user_id=current_user.id
     )
     return
 
 
 @router.delete("", status_code=204, response_class=Response)
-async def remove_multi_notebooks(
-    notebooks_ids: List[int] = Body(..., embed=True),
+async def remove_multi_note_folders(
+    note_folders_ids: List[int] = Body(..., embed=True),
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    crud.notebook.remove_multi(db, objects_ids=notebooks_ids, user_id=current_user.id)
+    crud.note_folder.remove_multi(
+        db, objects_ids=note_folders_ids, user_id=current_user.id
+    )
     return
 
 
 @router.post("/ranks", response_class=Response)
-async def update_notebooks_ranks(
-    update: schemas.NotebookNewRank,
+async def update_note_folders_ranks(
+    update: schemas.NoteFolderNewRank,
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    crud.notebook.update_ranks(db, update=update, user_id=current_user.id)
+    crud.note_folder.update_ranks(db, update=update, user_id=current_user.id)
     return

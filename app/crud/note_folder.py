@@ -10,53 +10,55 @@ from app import models, schemas
 from .base import CRUDBase
 
 
-class CRUDNotebook(
-    CRUDBase[models.Notebook, schemas.NotebookCreate, schemas.NotebookUpdate]
+class CRUDNoteFolder(
+    CRUDBase[models.NoteFolder, schemas.NoteFolderCreate, schemas.NoteFolderUpdate]
 ):
     class Errors:
         parent_not_found = {"loc": ["body", "parent_id"], "msg": "Parent not found."}
 
     def create(
-        self, db: Session, *, notebook_in: schemas.NotebookCreate, user_id: int
-    ) -> schemas.Notebook:
-        # if given, validate parent notebook
-        if notebook_in.parent_id:
+        self, db: Session, *, note_folder_in: schemas.NoteFolderCreate, user_id: int
+    ) -> schemas.NoteFolder:
+        # if given, validate parent note_folder
+        if note_folder_in.parent_id:
             try:
                 self.get_by_id_and_user_id(
-                    db, id=notebook_in.parent_id, user_id=user_id
+                    db, id=note_folder_in.parent_id, user_id=user_id
                 )
             except:
                 raise HTTPException(
                     status_code=422, detail=[self.Errors.parent_not_found]
                 )
 
-        rank = self.generate_rank(db, user_id=user_id, parent_id=notebook_in.parent_id)
+        rank = self.generate_rank(
+            db, user_id=user_id, parent_id=note_folder_in.parent_id
+        )
 
-        if not notebook_in.label:
-            if not notebook_in.parent_id:
-                notebook_in.label = f"Notebook {rank + 1}"
+        if not note_folder_in.label:
+            if not note_folder_in.parent_id:
+                note_folder_in.label = f"NoteFolder {rank + 1}"
             else:
-                notebook_in.label = f"Section {rank + 1}"
+                note_folder_in.label = f"Section {rank + 1}"
 
-        notebook = self.model(**notebook_in.dict(), user_id=user_id, rank=rank)
+        note_folder = self.model(**note_folder_in.dict(), user_id=user_id, rank=rank)
 
-        db.add(notebook)
+        db.add(note_folder)
         db.commit()
-        db.refresh(notebook)
+        db.refresh(note_folder)
 
-        return notebook
+        return note_folder
 
     def update(
         self,
         db: Session,
         *,
         id: int,
-        update: schemas.NotebookUpdate,
+        update: schemas.NoteFolderUpdate,
         user_id: int,
-    ) -> schemas.Notebook:
-        notebook = self.get_by_id_and_user_id(db, id=id, user_id=user_id)
+    ) -> schemas.NoteFolder:
+        note_folder = self.get_by_id_and_user_id(db, id=id, user_id=user_id)
 
-        if update.parent_id != notebook.parent_id:
+        if update.parent_id != note_folder.parent_id:
             if update.parent_id:
                 try:
                     self.get_by_id_and_user_id(db, id=update.parent_id, user_id=user_id)
@@ -66,13 +68,13 @@ class CRUDNotebook(
                     )
 
             rank = self.generate_rank(db, user_id=user_id, parent_id=update.parent_id)
-            notebook.rank = rank
+            note_folder.rank = rank
 
-        notebook.edited_at = datetime.utcnow()
-        notebook = super().update(
-            db, db_obj=notebook, obj_in=update.dict(exclude_unset=True)
+        note_folder.edited_at = datetime.utcnow()
+        note_folder = super().update(
+            db, db_obj=note_folder, obj_in=update.dict(exclude_unset=True)
         )
-        return notebook
+        return note_folder
 
     def remove_all_by_parent_id(self, db: Session, *, parent_id: int) -> None:
         sections = db.query(self.model).filter(self.model.parent_id == parent_id).all()
@@ -91,12 +93,12 @@ class CRUDNotebook(
         order: Optional[str],
         skip: int = 0,
         limit: int = 100,
-    ) -> List[schemas.Notebook]:
+    ) -> List[schemas.NoteFolder]:
         q = db.query(self.model).filter(self.model.user_id == user_id)
 
         if search:
             q = q.outerjoin(
-                models.Note, models.Note.notebook_id == self.model.id
+                models.Note, models.Note.note_folder_id == self.model.id
             ).filter(
                 or_(
                     func.lower(self.model.label.contains(func.lower(search))),
@@ -107,15 +109,15 @@ class CRUDNotebook(
         if sort == "rank":
             q = q.order_by(self.model.rank)
 
-        notebooks = q.offset(skip).limit(limit).all()
+        note_folders = q.offset(skip).limit(limit).all()
 
         if order == "desc":
-            notebooks.reverse()
+            note_folders.reverse()
 
-        return notebooks
+        return note_folders
 
     def generate_rank(self, db: Session, parent_id: Optional[int], user_id: int) -> int:
-        # determine custom order rank based on number of sibling notebooks
+        # determine custom order rank based on number of sibling note_folders
         return len(
             db.query(self.model)
             .filter(
@@ -125,44 +127,42 @@ class CRUDNotebook(
             .all()
         )
 
-    def remove_notebook_cascade(
-        self, db: Session, *, notebook_id: int, user_id: int
-    ) -> None:
-        notebook = self.get_by_id_and_user_id(db, id=notebook_id, user_id=user_id)
-        self.remove(db, id=notebook.id)
+    def remove_note_folder_cascade(self, db: Session, *, id: int, user_id: int) -> None:
+        note_folder = self.get_by_id_and_user_id(db, id=id, user_id=user_id)
+        self.remove(db, id=note_folder.id)
         return
 
     def update_ranks(
-        self, db: Session, *, update: schemas.NotebookNewRank, user_id: int
+        self, db: Session, *, update: schemas.NoteFolderNewRank, user_id: int
     ) -> None:
-        # get notebook
-        notebook = self.get_by_id_and_user_id(db, id=update.id, user_id=user_id)
-        # get notebooks
-        start = update.rank if update.rank < notebook.rank else notebook.rank
-        end = notebook.rank if update.rank < notebook.rank else update.rank
-        notebooks: List[schemas.Notebook] = (
+        # get note_folder
+        note_folder = self.get_by_id_and_user_id(db, id=update.id, user_id=user_id)
+        # get note_folders
+        start = update.rank if update.rank < note_folder.rank else note_folder.rank
+        end = note_folder.rank if update.rank < note_folder.rank else update.rank
+        note_folders: List[schemas.NoteFolder] = (
             db.query(self.model)
             .filter(
                 self.model.rank.in_([i for i in range(start, end + 1)]),
-                self.model.parent_id == notebook.parent_id,
+                self.model.parent_id == note_folder.parent_id,
                 self.model.user_id == user_id,
             )
             .all()
         )
         # update rankings
-        for n in notebooks:
-            if update.rank > notebook.rank:
+        for n in note_folders:
+            if update.rank > note_folder.rank:
                 n.rank -= 1
             else:
                 n.rank += 1
 
             db.add(n)
 
-        notebook.rank = update.rank
-        db.add(notebook)
+        note_folder.rank = update.rank
+        db.add(note_folder)
 
         db.commit()
         return
 
 
-notebook = CRUDNotebook(models.Notebook)
+note_folder = CRUDNoteFolder(models.NoteFolder)

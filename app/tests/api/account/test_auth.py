@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.core.config import settings
-from app.tests.utils.account import create_token, create_account
+from app.tests.utils.account import create_account, create_token
 
 
 def test_get_token_via_email(client: TestClient, db_session: Session) -> None:

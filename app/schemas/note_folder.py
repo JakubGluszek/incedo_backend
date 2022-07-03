@@ -4,17 +4,17 @@ from typing import Optional
 from pydantic import BaseModel, Field, validator
 
 
-class NotebookCreate(BaseModel):
+class NoteFolderCreate(BaseModel):
     label: Optional[str] = Field(None, max_length=32)
     parent_id: Optional[int] = None
 
 
-class NotebookUpdate(BaseModel):
+class NoteFolderUpdate(BaseModel):
     label: Optional[str] = Field(None, max_length=32)
     parent_id: Optional[int] = None
 
 
-class Notebook(BaseModel):
+class NoteFolder(BaseModel):
     id: int
     label: str
     rank: int
@@ -24,7 +24,7 @@ class Notebook(BaseModel):
     user_id: int
 
 
-class NotebookOut(BaseModel):
+class NoteFolderOut(BaseModel):
     id: int
     label: str
     rank: int
@@ -40,6 +40,6 @@ class NotebookOut(BaseModel):
         orm_mode = True
 
 
-class NotebookNewRank(BaseModel):
+class NoteFolderNewRank(BaseModel):
     id: int
     rank: int

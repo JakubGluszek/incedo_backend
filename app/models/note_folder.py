@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 
-class Notebook(Base):
+class NoteFolder(Base):
     id: int = Column(Integer, primary_key=True)
     label: str = Column(String(32), nullable=False)
     rank: int = Column(Integer, nullable=False)
@@ -16,10 +16,10 @@ class Notebook(Base):
     user_id: int = Column(Integer, nullable=False)
 
     sections = relationship(
-        "Notebook",
+        "NoteFolder",
         cascade="all,delete",
         foreign_keys=[parent_id],
-        primaryjoin="Notebook.id == Notebook.parent_id",
+        primaryjoin="NoteFolder.id == NoteFolder.parent_id",
     )
 
     def __repr__(self):
