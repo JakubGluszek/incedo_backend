@@ -47,3 +47,4 @@ class NoteOut(BaseModel):
 class NoteNewRank(BaseModel):
     id: int
     rank: int
+    note_folder_id: Optional[int] = None

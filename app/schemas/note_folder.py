@@ -43,3 +43,4 @@ class NoteFolderOut(BaseModel):
 class NoteFolderNewRank(BaseModel):
     id: int
     rank: int
+    parent_id: Optional[int] = None

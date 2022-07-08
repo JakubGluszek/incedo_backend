@@ -32,7 +32,7 @@ def send_email(
 def send_token(email_to: str, token: str) -> None:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Sign in."
-    link = f"{settings.FRONTEND_HOST}/callback/email?token={token}"
+    link = f"{settings.FRONTEND_HOST}/login?token={token}"
 
     with open(os.path.abspath(path=settings.EMAIL_TEMPLATES_DIR + "sign_in.html")) as f:
         template_str = f.read()

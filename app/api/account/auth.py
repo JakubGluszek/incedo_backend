@@ -78,8 +78,20 @@ async def refresh_token(Authorize: AuthJWT = Depends()) -> Any:
     user_id = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=user_id)
 
-    response = Response()
+    response = JSONResponse({"access_token": new_access_token, "refresh_token": None})
 
     Authorize.set_access_cookies(new_access_token, response)
 
-    return {"access_token": new_access_token, "refresh_token": None}
+    return response
+
+
+@router.delete("")
+async def sign_out(
+    db: Session = Depends(deps.get_db),
+    current_user: schemas.User = Depends(deps.get_current_user),
+    Authorize: AuthJWT = Depends(),
+) -> Any:
+
+    Authorize.unset_jwt_cookies()
+
+    return

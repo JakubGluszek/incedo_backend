@@ -6,7 +6,13 @@ from sqlalchemy.orm import Session
 from app import crud, schemas
 from app.api import deps
 
+
 router = APIRouter()
+
+
+class NoteFolderWithNotes(schemas.NoteFolderOut):
+    notes: List[schemas.NoteOut]
+    sections: List[schemas.NoteFolderOut]
 
 
 @router.post("", response_model=schemas.NoteFolderOut)
@@ -21,7 +27,7 @@ async def create_note_folders(
     return note_folder
 
 
-@router.get("/{id}", response_model=schemas.NoteFolderWithNotes)
+@router.get("/{id}", response_model=NoteFolderWithNotes)
 async def get_note_folder(
     id: int,
     db: Session = Depends(deps.get_db),
@@ -39,7 +45,7 @@ async def get_multi_note_folders(
     sort: Optional[str] = None,
     order: Optional[str] = None,
     skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=0, le=100),
+    limit: int = Query(None, ge=0),
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
@@ -74,9 +80,7 @@ async def remove_note_folder(
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    crud.note_folder.remove_note_folder_cascade(
-        db, id=id, user_id=current_user.id
-    )
+    crud.note_folder.remove_note_folder_cascade(db, id=id, user_id=current_user.id)
     return
 
 
@@ -89,14 +93,4 @@ async def remove_multi_note_folders(
     crud.note_folder.remove_multi(
         db, objects_ids=note_folders_ids, user_id=current_user.id
     )
-    return
-
-
-@router.post("/ranks", response_class=Response)
-async def update_note_folders_ranks(
-    update: schemas.NoteFolderNewRank,
-    db: Session = Depends(deps.get_db),
-    current_user: schemas.User = Depends(deps.get_current_user),
-) -> Any:
-    crud.note_folder.update_ranks(db, update=update, user_id=current_user.id)
     return

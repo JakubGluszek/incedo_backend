@@ -92,7 +92,7 @@ class CRUDNoteFolder(
         sort: Optional[str],
         order: Optional[str],
         skip: int = 0,
-        limit: int = 100,
+        limit: Optional[int],
     ) -> List[schemas.NoteFolder]:
         q = db.query(self.model).filter(self.model.user_id == user_id)
 
@@ -109,7 +109,12 @@ class CRUDNoteFolder(
         if sort == "rank":
             q = q.order_by(self.model.rank)
 
-        note_folders = q.offset(skip).limit(limit).all()
+        q = q.offset(skip)
+
+        if limit:
+            q = q.limit(limit)
+
+        note_folders = q.all()
 
         if order == "desc":
             note_folders.reverse()
@@ -130,38 +135,6 @@ class CRUDNoteFolder(
     def remove_note_folder_cascade(self, db: Session, *, id: int, user_id: int) -> None:
         note_folder = self.get_by_id_and_user_id(db, id=id, user_id=user_id)
         self.remove(db, id=note_folder.id)
-        return
-
-    def update_ranks(
-        self, db: Session, *, update: schemas.NoteFolderNewRank, user_id: int
-    ) -> None:
-        # get note_folder
-        note_folder = self.get_by_id_and_user_id(db, id=update.id, user_id=user_id)
-        # get note_folders
-        start = update.rank if update.rank < note_folder.rank else note_folder.rank
-        end = note_folder.rank if update.rank < note_folder.rank else update.rank
-        note_folders: List[schemas.NoteFolder] = (
-            db.query(self.model)
-            .filter(
-                self.model.rank.in_([i for i in range(start, end + 1)]),
-                self.model.parent_id == note_folder.parent_id,
-                self.model.user_id == user_id,
-            )
-            .all()
-        )
-        # update rankings
-        for n in note_folders:
-            if update.rank > note_folder.rank:
-                n.rank -= 1
-            else:
-                n.rank += 1
-
-            db.add(n)
-
-        note_folder.rank = update.rank
-        db.add(note_folder)
-
-        db.commit()
         return
 
 

@@ -140,38 +140,5 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
             .all()
         )
 
-    def update_ranks(
-        self, db: Session, *, update: schemas.NoteNewRank, user_id: int
-    ) -> None:
-        # get note
-        note = self.get_by_id_and_user_id(db, id=update.id, user_id=user_id)
-        # determine which notes to update
-        start = update.rank if update.rank < note.rank else note.rank
-        end = note.rank if update.rank < note.rank else update.rank
-        # get notes
-        notes: List[schemas.Note] = (
-            db.query(self.model)
-            .filter(
-                self.model.rank.in_([i for i in range(start, end + 1)]),
-                self.model.note_folder_id == note.note_folder_id,
-                self.model.user_id == user_id,
-            )
-            .all()
-        )
-        # update rankings
-        for n in notes:
-            if update.rank > note.rank:
-                n.rank -= 1
-            else:
-                n.rank += 1
-
-            db.add(n)
-
-        note.rank = update.rank
-        db.add(note)
-
-        db.commit()
-        return
-
 
 note = CRUDNote(models.Note)

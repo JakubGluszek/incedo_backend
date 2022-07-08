@@ -8,13 +8,13 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 COPY . .
 
-RUN chmod +x ./prestart.sh
+RUN chmod +x ./scripts/prestart.sh
 
 RUN chmod +x ./scripts/test.sh
 
 RUN ./scripts/test.sh
 
-RUN ./prestart.sh
+RUN ./scripts/prestart.sh
 
 RUN chmod +x ./scripts/start.sh
 

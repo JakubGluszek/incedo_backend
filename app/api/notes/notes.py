@@ -1,11 +1,12 @@
 from typing import Any, List, Optional
 
 from fastapi import APIRouter, Body, Depends, Query, Response
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app import crud, schemas
 
-from . import deps
+from app.api import deps
 
 router = APIRouter()
 
@@ -87,11 +88,18 @@ async def remove_multi_notes(
     return
 
 
+class NewRank(BaseModel):
+    type: str
+    id: int
+    parent_id: Optional[int] = None
+    rank: int
+
+
 @router.post("/ranks", response_class=Response)
 async def update_notes_ranks(
-    update: schemas.NoteNewRank,
+    update: NewRank,
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    crud.note.update_ranks(db, update=update, user_id=current_user.id)
+    print(update)
     return
