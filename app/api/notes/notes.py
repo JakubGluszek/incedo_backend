@@ -4,7 +4,7 @@ from fastapi import APIRouter, Body, Depends, Query, Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app import crud, schemas, services
 
 from app.api import deps
 
@@ -40,7 +40,7 @@ async def get_multi_notes(
     limit: int = Query(100, ge=0, le=100),
     orphaned: bool = Query(
         False,
-        description="Get multi notes with note_folder_id == null. These notes are scheduled for deletion.",
+        description="Get multi notes with parent_id == null. These notes are scheduled for deletion.",
     ),
     current_user: schemas.User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
@@ -88,18 +88,11 @@ async def remove_multi_notes(
     return
 
 
-class NewRank(BaseModel):
-    type: str
-    id: int
-    parent_id: Optional[int] = None
-    rank: int
-
-
 @router.post("/ranks", response_class=Response)
 async def update_notes_ranks(
-    update: NewRank,
+    update: schemas.NewRank,
     db: Session = Depends(deps.get_db),
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
-    print(update)
+    services.notes.sort(db, payload=update, user_id=current_user.id)
     return

@@ -23,4 +23,4 @@ class NoteFolder(Base):
     )
 
     def __repr__(self):
-        return f"id:{self.id}, parent_id:{self.parent_id}, user_id:{self.user_id}"
+        return f"type: folder, id: {self.id}, parent_id: {self.parent_id}, user_id: {self.user_id};"

@@ -98,7 +98,7 @@ class CRUDNoteFolder(
 
         if search:
             q = q.outerjoin(
-                models.Note, models.Note.note_folder_id == self.model.id
+                models.Note, models.Note.parent_id == self.model.id
             ).filter(
                 or_(
                     func.lower(self.model.label.contains(func.lower(search))),

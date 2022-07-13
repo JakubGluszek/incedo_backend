@@ -13,7 +13,7 @@ from .base import CRUDBase
 class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
     class Errors:
         no_note_folder = {
-            "loc": ["body", "note_folder_id"],
+            "loc": ["body", "parent_id"],
             "msg": "NoteFolder not found",
         }
         not_found_422 = {"loc": ["body", "id"], "msg": "Note not found."}
@@ -24,12 +24,12 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         # validate note_folder
         try:
             note_folder = crud.note_folder.get_by_id_and_user_id(
-                db, id=note_in.note_folder_id, user_id=user_id
+                db, id=note_in.parent_id, user_id=user_id
             )
         except HTTPException:
             raise HTTPException(status_code=422, detail=[self.Errors.no_note_folder])
 
-        rank = self.generate_rank(db, note_folder_id=note_folder.id)
+        rank = self.generate_rank(db, parent_id=note_folder.id)
 
         if not note_in.label:
             note_in.label = f"Note {rank + 1}"
@@ -52,10 +52,10 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
             raise HTTPException(status_code=404)
 
         # validate note_folder
-        if update.note_folder_id:
+        if update.parent_id:
             try:
                 note_folder = crud.note_folder.get_by_id_and_user_id(
-                    db, id=update.note_folder_id, user_id=user_id
+                    db, id=update.parent_id, user_id=user_id
                 )
             except HTTPException:
                 raise HTTPException(
@@ -63,7 +63,7 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
                 )
         else:
             note_folder = crud.note_folder.get_by_id_and_user_id(
-                db, id=note.note_folder_id, user_id=user_id
+                db, id=note.parent_id, user_id=user_id
             )
 
         edited_at = datetime.utcnow()
@@ -91,9 +91,9 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         q = db.query(self.model).filter(self.model.user_id == user_id)
 
         if orphaned:
-            q = q.filter(self.model.note_folder_id.is_(None))
+            q = q.filter(self.model.parent_id.is_(None))
         else:
-            q = q.filter(self.model.note_folder_id.isnot(None))
+            q = q.filter(self.model.parent_id.isnot(None))
 
         if search:
             q = q.filter(
@@ -119,10 +119,10 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         db.commit()
         return
 
-    def remove_all_by_note_folder_id(self, db: Session, *, note_folder_id: int) -> None:
+    def remove_all_by_parent_id(self, db: Session, *, parent_id: int) -> None:
         notes = (
             db.query(self.model)
-            .filter(self.model.note_folder_id == note_folder_id)
+            .filter(self.model.parent_id == parent_id)
             .all()
         )
         for note in notes:
@@ -130,12 +130,12 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         db.commit()
         return
 
-    def generate_rank(self, db: Session, note_folder_id: Optional[int]) -> int:
+    def generate_rank(self, db: Session, parent_id: Optional[int]) -> int:
         # determine custom order rank based on number of sibling note_folders
         return len(
             db.query(self.model)
             .filter(
-                self.model.note_folder_id == note_folder_id,
+                self.model.parent_id == parent_id,
             )
             .all()
         )

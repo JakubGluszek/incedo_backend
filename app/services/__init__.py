@@ -1,2 +1,2 @@
 from . import account
-from . import notes
+from .notes import notes

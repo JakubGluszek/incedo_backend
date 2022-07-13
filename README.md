@@ -2,11 +2,7 @@
 
 ## TODO
 
-* [ ] Sort notes
-
-* [ ] Custom themes
-
-  Subscribed user's only.
+* [ ] handle api versioning
 
 * [ ] Share notes
 * [ ] Make user's data secure & unread'able by server itself
@@ -17,5 +13,5 @@
     * [x] auth
     * [x] user
     * [ ] settings ???
-  * [ ] note_folders
+  * [ ] note_folders ???
   * [ ] notes

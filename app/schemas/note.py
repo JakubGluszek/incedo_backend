@@ -7,13 +7,13 @@ from pydantic import BaseModel, Field, validator
 class NoteCreate(BaseModel):
     label: str = Field(None, max_length=64)
     body: Optional[str] = ""
-    note_folder_id: int
+    parent_id: int
 
 
 class NoteUpdate(BaseModel):
     label: Optional[str] = Field(None, max_length=64)
     body: Optional[str] = None
-    note_folder_id: Optional[int] = None
+    parent_id: Optional[int] = None
 
 
 class Note(BaseModel):
@@ -23,7 +23,7 @@ class Note(BaseModel):
     rank: int
     created_at: datetime
     edited_at: datetime
-    note_folder_id: Optional[int]
+    parent_id: Optional[int]
     user_id: int
 
 
@@ -34,7 +34,7 @@ class NoteOut(BaseModel):
     rank: int
     created_at: int
     edited_at: int
-    note_folder_id: Optional[int]
+    parent_id: Optional[int]
 
     @validator("created_at", "edited_at", pre=True)
     def convert_to_timestamp(cls, v: datetime) -> int:
@@ -47,4 +47,4 @@ class NoteOut(BaseModel):
 class NoteNewRank(BaseModel):
     id: int
     rank: int
-    note_folder_id: Optional[int] = None
+    parent_id: Optional[int] = None
