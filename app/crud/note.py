@@ -21,23 +21,11 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
     def create(
         self, db: Session, *, note_in: schemas.NoteCreate, user_id: int
     ) -> schemas.Note:
-        # validate note_folder
-        try:
-            note_folder = crud.note_folder.get_by_id_and_user_id(
-                db, id=note_in.parent_id, user_id=user_id
-            )
-        except HTTPException:
-            raise HTTPException(status_code=422, detail=[self.Errors.no_note_folder])
+        if not note_in.parent_id:
+            note_in.parent_id = 0
+            
+        note = self.model(**note_in.dict(exclude_none=True), user_id=user_id, rank=0)
 
-        rank = self.generate_rank(db, parent_id=note_folder.id)
-
-        if not note_in.label:
-            note_in.label = f"Note {rank + 1}"
-
-        note = self.model(**note_in.dict(exclude_none=True), user_id=user_id, rank=rank)
-
-        note_folder.edited_at = datetime.utcnow()
-        db.add(note_folder)
         db.add(note)
         db.commit()
         db.refresh(note)
@@ -120,11 +108,7 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         return
 
     def remove_all_by_parent_id(self, db: Session, *, parent_id: int) -> None:
-        notes = (
-            db.query(self.model)
-            .filter(self.model.parent_id == parent_id)
-            .all()
-        )
+        notes = db.query(self.model).filter(self.model.parent_id == parent_id).all()
         for note in notes:
             db.delete(note)
         db.commit()
