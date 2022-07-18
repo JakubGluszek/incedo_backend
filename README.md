@@ -2,9 +2,6 @@
 
 ## TODO
 
-* [ ] handle api versioning
-
-* [ ] Share notes
 * [ ] Make user's data secure & unread'able by server itself
 * [ ] Handle user's avatar
 
@@ -15,3 +12,5 @@
     * [ ] settings ???
   * [ ] note_folders ???
   * [ ] notes
+
+* [ ] Validate things like min length, max length etc

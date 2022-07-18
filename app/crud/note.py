@@ -1,21 +1,16 @@
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import HTTPException
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import models, schemas
 
 from .base import CRUDBase
 
 
 class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
     class Errors:
-        no_note_folder = {
-            "loc": ["body", "parent_id"],
-            "msg": "NoteFolder not found",
-        }
         not_found_422 = {"loc": ["body", "id"], "msg": "Note not found."}
 
     def create(
@@ -35,31 +30,10 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
     def update(
         self, db: Session, *, id: int, update: schemas.NoteUpdate, user_id: int
     ) -> schemas.Note:
-        note = self.get(db, id)
-        if not note or note.user_id != user_id:
-            raise HTTPException(status_code=404)
-
-        # validate note_folder
-        if update.parent_id:
-            try:
-                note_folder = crud.note_folder.get_by_id_and_user_id(
-                    db, id=update.parent_id, user_id=user_id
-                )
-            except HTTPException:
-                raise HTTPException(
-                    status_code=422, detail=[self.Errors.no_note_folder]
-                )
-        else:
-            note_folder = crud.note_folder.get_by_id_and_user_id(
-                db, id=note.parent_id, user_id=user_id
-            )
+        note = self.get_by_id_and_user_id(db, id=id, user_id=user_id)
 
         edited_at = datetime.utcnow()
-
-        note_folder.edited_at = edited_at
         note.edited_at = edited_at
-
-        db.add(note_folder)
 
         updated_note = super().update(db, db_obj=note, obj_in=update)
         return updated_note
@@ -102,27 +76,9 @@ class CRUDNote(CRUDBase[models.Note, schemas.NoteCreate, schemas.NoteUpdate]):
         return notes
 
     def remove(self, db: Session, id: int, user_id: int) -> None:
-        note_folder = self.get_by_id_and_user_id(db, id=id, user_id=user_id)
-        db.delete(note_folder)
+        note = self.get_by_id_and_user_id(db, id=id, user_id=user_id)
+        db.delete(note)
         db.commit()
         return
-
-    def remove_all_by_parent_id(self, db: Session, *, parent_id: int) -> None:
-        notes = db.query(self.model).filter(self.model.parent_id == parent_id).all()
-        for note in notes:
-            db.delete(note)
-        db.commit()
-        return
-
-    def generate_rank(self, db: Session, parent_id: Optional[int]) -> int:
-        # determine custom order rank based on number of sibling note_folders
-        return len(
-            db.query(self.model)
-            .filter(
-                self.model.parent_id == parent_id,
-            )
-            .all()
-        )
-
 
 note = CRUDNote(models.Note)
