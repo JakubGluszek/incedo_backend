@@ -7,7 +7,7 @@ from . import account, notes
 
 router = APIRouter()
 router.include_router(account.router, prefix="/account")
-router.include_router(notes.router)
+router.include_router(notes.router, prefix="/notes", tags=["Notes"])
 
 
 @AuthJWT.load_config

@@ -1,10 +1,9 @@
 from typing import Any, List, Optional
 
 from fastapi import APIRouter, Body, Depends, Query, Response
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app import crud, schemas, services
+from app import crud, schemas
 
 from app.api import deps
 
@@ -34,14 +33,8 @@ async def get_note(
 @router.get("", response_model=List[schemas.NoteOut])
 async def get_multi_notes(
     search: Optional[str] = None,
-    sort: Optional[str] = None,
-    order: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=0, le=100),
-    orphaned: bool = Query(
-        False,
-        description="Get multi notes with parent_id == null. These notes are scheduled for deletion.",
-    ),
     current_user: schemas.User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Any:
@@ -49,9 +42,6 @@ async def get_multi_notes(
         db,
         user_id=current_user.id,
         search=search,
-        sort=sort,
-        order=order,
-        orphaned=orphaned,
         skip=skip,
         limit=limit,
     )
@@ -85,14 +75,4 @@ async def remove_multi_notes(
     current_user: schemas.User = Depends(deps.get_current_user),
 ) -> Any:
     crud.note.remove_multi(db, objects_ids=notes_ids, user_id=current_user.id)
-    return
-
-
-@router.post("/ranks", response_class=Response)
-async def update_notes_ranks(
-    update: schemas.NewRank,
-    db: Session = Depends(deps.get_db),
-    current_user: schemas.User = Depends(deps.get_current_user),
-) -> Any:
-    services.notes.sort(db, payload=update, user_id=current_user.id)
     return

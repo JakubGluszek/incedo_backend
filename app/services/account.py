@@ -56,7 +56,6 @@ def delete_account(db: Session, *, user_id: int) -> None:
         raise HTTPException(status_code=404)
 
     crud.note.remove_all_by_user_id(db, user_id=user_id)
-    crud.note_folder.remove_all_by_user_id(db, user_id=user_id)
-    crud.user_settings.remove_by_user_id(db, user_id=user_id)
+    crud.user_settings.remove_first_by_user_id(db, user_id=user_id)
     crud.user.remove(db, id=user_id)
     return

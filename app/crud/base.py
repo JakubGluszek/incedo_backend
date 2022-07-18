@@ -95,7 +95,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.commit()
         return obj
 
-    def remove_by_user_id(self, db: Session, *, user_id: int) -> None:
+    def remove_first_by_user_id(self, db: Session, *, user_id: int) -> None:
         obj = db.query(self.model).filter(self.model.user_id == user_id).first()
         if obj:
             db.delete(obj)

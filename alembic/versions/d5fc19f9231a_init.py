@@ -1,8 +1,8 @@
-"""initial
+"""init
 
-Revision ID: 5e72afa9772f
+Revision ID: d5fc19f9231a
 Revises: 
-Create Date: 2022-07-08 21:31:55.283117
+Create Date: 2022-07-18 11:55:55.348983
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5e72afa9772f'
+revision = 'd5fc19f9231a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,21 +22,24 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('label', sa.String(length=64), nullable=True),
     sa.Column('body', sa.Text(), nullable=True),
-    sa.Column('rank', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('edited_at', sa.DateTime(), nullable=True),
-    sa.Column('note_folder_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('notefolder',
+    op.create_table('theme',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('label', sa.String(length=32), nullable=False),
-    sa.Column('rank', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('edited_at', sa.DateTime(), nullable=True),
-    sa.Column('parent_id', sa.Integer(), nullable=True),
-    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=32), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('primary', sa.String(length=7), nullable=False),
+    sa.Column('secondary', sa.String(length=7), nullable=False),
+    sa.Column('accent', sa.String(length=7), nullable=False),
+    sa.Column('neutral', sa.String(length=7), nullable=False),
+    sa.Column('base', sa.String(length=7), nullable=False),
+    sa.Column('info', sa.String(length=7), nullable=False),
+    sa.Column('success', sa.String(length=7), nullable=False),
+    sa.Column('warning', sa.String(length=7), nullable=False),
+    sa.Column('error', sa.String(length=7), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('token',
@@ -70,6 +73,6 @@ def downgrade():
     op.drop_table('usersettings')
     op.drop_table('user')
     op.drop_table('token')
-    op.drop_table('notefolder')
+    op.drop_table('theme')
     op.drop_table('note')
     # ### end Alembic commands ###
