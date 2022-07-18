@@ -8,6 +8,8 @@ Create Date: 2022-07-18 11:55:55.348983
 from alembic import op
 import sqlalchemy as sa
 
+from app.core.config import settings
+
 
 # revision identifiers, used by Alembic.
 revision = 'd5fc19f9231a'
@@ -54,7 +56,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=32), server_default='hooman', nullable=False),
     sa.Column('email', sa.String(length=256), nullable=False),
-    sa.Column('avatar', sa.String(length=512), server_default='http://192.168.2.56:8000/static/images/avatars/default.png', nullable=False),
+    sa.Column('avatar', sa.String(length=512), server_default=f'{settings.HOST}/static/images/avatars/default.png', nullable=False),
     sa.Column('is_super', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')

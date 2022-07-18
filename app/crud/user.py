@@ -5,9 +5,10 @@ from pydantic import EmailStr
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app import models, schemas
-
 from .base import CRUDBase
+from app import models, schemas
+from app.core.config import settings
+
 
 
 class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
@@ -26,6 +27,7 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
         # create user
         user = models.User(
             **user_in.dict(exclude_none=True),
+            avatar=settings.DEFAULT_AVATAR,
             is_super=is_super,
         )
 
