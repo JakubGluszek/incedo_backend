@@ -45,7 +45,7 @@ def sign_in_via_google(db: Session, *, code: dict) -> schemas.User:
 
     if not user:
         user_in = schemas.UserCreate(email=email)
-        create_account(db, user_in=user_in)
+        user = create_account(db, user_in=user_in)
 
     return user
 
