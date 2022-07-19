@@ -59,6 +59,7 @@ class Settings(BaseSettings):
 class JWTSettings(BaseSettings):
     authjwt_secret_key: str = os.getenv("SECRET_KEY")
     authjwt_token_location = {"cookies", "headers"}
+    authjwt_cookie_max_age: int = 60 * 60 * 24 * 30
     authjwt_access_token_expires: int = 60 * 60  # seconds
     authjwt_cookie_csrf_protect: bool = os.getenv("authjwt_cookie_csrf_protect")
     authjwt_cookie_secure: bool = os.getenv("authjwt_cookie_secure")
